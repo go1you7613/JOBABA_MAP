@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일자리 맵 서비스 | 경기도일자리재단</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary:    #1E5FBF;
+            --primary-dk: #154da3;
+            --primary-lt: #e8f0ff;
+            --gray-200:   #eeeff1;
+            --white:      #ffffff;
+        }
+        html, body {
+            height: 100%;
+            background: #f8f9fa;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-size: 14px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 32px;
+        }
+        .city-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .city-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            letter-spacing: -.2px;
+        }
+        .map-btn {
+            padding: 10px 24px;
+            border: 1.5px solid var(--primary);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+        }
+        .map-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .map-btn:active {
+            background: var(--primary-dk);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="city-item">
+        <span class="city-label">성남시</span>
+        <button class="map-btn"
+                data-lat="37.4201" data-lng="127.1268" data-name="성남시"
+                onclick="openMap(this)">일자리맵</button>
+    </div>
+
+    <div class="city-item">
+        <span class="city-label">부천시</span>
+        <button class="map-btn"
+                data-lat="37.5035" data-lng="126.7660" data-name="부천시"
+                onclick="openMap(this)">일자리맵</button>
+    </div>
+
+    <div class="city-item">
+        <span class="city-label">고양시</span>
+        <button class="map-btn"
+                data-lat="37.6564" data-lng="126.8350" data-name="고양시"
+                onclick="openMap(this)">일자리맵</button>
+    </div>
+
+    <div class="city-item">
+        <span class="city-label">화성시</span>
+        <button class="map-btn"
+                data-lat="37.4187" data-lng="127.5095" data-name="화성시"
+                onclick="openMap(this)">일자리맵</button>
+    </div>
+
+</div>
+
+<script>
+    function openMap(btn) {
+        var lat  = btn.dataset.lat;
+        var lng  = btn.dataset.lng;
+        var name = encodeURIComponent(btn.dataset.name);
+        var url  = 'https://jobaba-map.tanauxd.com/map/index.html?lat=' + lat + '&lng=' + lng + '&name=' + name;
+
+        var popup = window.open(
+            url,
+            'jobaba_map_' + btn.dataset.name,
+            'width=1280,height=800,left=100,top=80,resizable=yes,scrollbars=no'
+        );
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            alert('팝업이 차단되었습니다.\n브라우저의 팝업 허용 설정 후 다시 시도해 주세요.');
+        } else {
+            popup.focus();
+        }
+    }
+</script>
+
+</body>
+</html>
