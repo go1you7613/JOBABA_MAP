@@ -18,6 +18,7 @@ CLAUDE.md
 # Build/runtime artifacts
 backend/.gradle/
 backend/build/
+backend/*/build/
 backend/src/main/webapp/
 tmp/
 outputs/

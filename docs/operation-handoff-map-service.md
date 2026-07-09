@@ -17,7 +17,7 @@
   4. 개발서버 최종 확인
   5. 운영서버 배포
 
-현재 이 저장소는 독립 Spring Boot 형태로 개발되어 있습니다. 개발팀은 아래 소스, 정적 리소스, MyBatis mapper, DB 객체를 잡아바 기존 프로젝트 구조에 맞게 이식해야 합니다.
+현재 이 저장소는 `fe-web`, `be-biz`, `core-domain`으로 분리된 Spring Boot 멀티모듈 형태로 개발되어 있습니다. 개발팀은 아래 JSP 화면, 정적 리소스, API 소스, MyBatis mapper, DB 객체를 잡아바 기존 MSA 프로젝트 구조에 맞게 이식해야 합니다.
 
 ## 2. 기능 스펙 요약
 
@@ -52,18 +52,18 @@
 ### 3.1 화면 로딩 흐름
 
 1. 사용자가 `https://job.gg.go.kr/jobaba_map/`에 접근합니다.
-2. 잡아바 서버가 일자리맵 정적 화면 `index.html`을 반환합니다.
-3. `index.html`이 `css/map.css`, `js/map.js`를 로드합니다.
+2. `fe-web`이 일자리맵 JSP 화면 `map/index.jsp`를 렌더링합니다.
+3. JSP 화면이 `css/map.css`, `js/map.js`를 로드합니다.
 4. `map.js`가 Kakao Maps JS SDK를 로드합니다.
 5. 지도 초기화 후 Kakao 지도 `idle` 이벤트에서 채용공고 목록 조회가 실행됩니다.
 
 현재 독립 앱 기준 페이지 컨트롤러는 `MapController`입니다.
 
-- 파일: `backend/src/main/java/kr/go/tkjf/usr/map/controller/MapController.java`
+- 파일: `backend/fe-web/src/main/java/kr/go/tkjf/usr/map/controller/MapController.java`
 - 현재 경로: `/map`
-- 현재 forward: `/map/index.html`
+- 현재 view: `map/index`
 
-잡아바 운영 적용 시에는 `/jobaba_map/` 요청이 일자리맵 화면을 반환하도록 기존 잡아바 라우팅 또는 `ResourceHandler`를 조정해야 합니다.
+잡아바 운영 적용 시에는 `/jobaba_map/` 요청이 `fe-web`의 JSP 화면을 반환하고, `/api/v1/map/**` 요청은 `be-biz`로 라우팅되도록 Gateway/Ingress 또는 기존 라우팅을 조정해야 합니다.
 
 ### 3.2 채용공고 목록 조회 흐름
 
@@ -81,13 +81,13 @@
 
 관련 파일:
 
-- `backend/src/main/resources/static/map/js/map.js`
+- `backend/fe-web/src/main/resources/static/map/js/map.js`
   - `loadJobs()`
   - `buildJobSearchParams()`
   - `appendActiveServerFilters()`
-- `backend/src/main/java/kr/go/tkjf/usr/map/controller/MapApiController.java`
-- `backend/src/main/java/kr/go/tkjf/usr/map/service/impl/MapServiceImpl.java`
-- `backend/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
+- `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/controller/MapApiController.java`
+- `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/service/impl/MapServiceImpl.java`
+- `backend/core-domain/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
 
 ### 3.3 좌표 변환 흐름
 
@@ -128,7 +128,7 @@ Kakao Maps JavaScript 키는 운영 반영 전 반드시 개발팀 키로 교체
 
 현재 키 위치:
 
-- 파일: `backend/src/main/resources/static/map/js/kakao-key.js`
+- 파일: `backend/fe-web/src/main/resources/static/map/js/kakao-key.js`
 - 위치: `window.JobabaMapKakaoKey.selectKakaoJsKey()`
 - 현재 코드:
 
@@ -140,7 +140,7 @@ var KAKAO_JS_KEY = window.JobabaMapKakaoKey.selectKakaoJsKey(window.location.hre
 
 SDK 로드 위치:
 
-- 파일: `backend/src/main/resources/static/map/js/map.js`
+- 파일: `backend/fe-web/src/main/resources/static/map/js/map.js`
 - 처리: `script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + KAKAO_JS_KEY + '&libraries=services&autoload=false';`
 
 운영 적용 시 확인할 것:
@@ -150,9 +150,9 @@ SDK 로드 위치:
   - 로컬: `localhost`
   - 개발서버: `https://jobaba-map.tanauxd.com`
   - 운영: `job.gg.go.kr`
-- 모바일 현위치 기능은 브라우저 보안 정책상 HTTPS 또는 localhost에서만 정상 동작합니다. 개발서버 모바일 QA는 `https://jobaba-map.tanauxd.com/map/index.html`처럼 HTTPS 도메인으로 접속해야 합니다.
+- 모바일 현위치 기능은 브라우저 보안 정책상 HTTPS 또는 localhost에서만 정상 동작합니다. 개발서버 모바일 QA는 `https://jobaba-map.tanauxd.com/map`처럼 HTTPS 도메인으로 접속해야 합니다.
 - 정적 리소스 경로를 `/jobaba_map/js/...`로 변경해 배치하는 경우, 변경된 경로의 `kakao-key.js`가 함께 배포되어야 합니다.
-- `map-share.html`을 운영에서 사용할 경우 `backend/src/main/resources/static/map/map-share.html`의 `/map/index.html` 링크도 `/jobaba_map/` 기준으로 변경해야 합니다.
+- `map-share.jsp`를 운영에서 사용할 경우 `backend/fe-web/src/main/webapp/WEB-INF/jsp/map/map-share.jsp`의 팝업 링크도 `/jobaba_map/` 기준으로 확인해야 합니다.
 
 ## 5. 소스 적용 범위
 
@@ -162,62 +162,67 @@ SDK 로드 위치:
 
 | 구분 | 파일 | 역할 |
 |---|---|---|
-| Controller | `backend/src/main/java/kr/go/tkjf/usr/map/controller/MapController.java` | 일자리맵 페이지 진입 |
-| REST Controller | `backend/src/main/java/kr/go/tkjf/usr/map/controller/MapApiController.java` | 지도 조회/상세/좌표 저장 API |
-| Service | `backend/src/main/java/kr/go/tkjf/usr/map/service/MapService.java` | 지도 서비스 인터페이스 |
-| Service Impl | `backend/src/main/java/kr/go/tkjf/usr/map/service/impl/MapServiceImpl.java` | 페이징, 공공/민간 균형, 좌표 검증 |
-| DAO | `backend/src/main/java/kr/go/tkjf/usr/map/dao/MapDao.java` | MyBatis mapper 인터페이스 |
-| VO | `backend/src/main/java/kr/go/tkjf/usr/map/vo/JobPostingVO.java` | 채용공고 응답 |
-| VO | `backend/src/main/java/kr/go/tkjf/usr/map/vo/MapSearchVO.java` | 검색 조건 |
-| VO | `backend/src/main/java/kr/go/tkjf/usr/map/vo/MapCoordVO.java` | 좌표 저장 요청 |
+| FE Controller | `backend/fe-web/src/main/java/kr/go/tkjf/usr/map/controller/MapController.java` | 일자리맵 JSP 화면 진입 |
+| REST Controller | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/controller/MapApiController.java` | 지도 조회/상세/좌표 저장 API |
+| API 보안 정책 | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/controller/MapOriginPolicy.java` | 좌표 저장 API Origin 검증 |
+| CORS 설정 | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/config/MapCorsConfig.java` | `fe-web` → `be-biz` 브라우저 호출 허용 |
+| Service | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/service/MapService.java` | 지도 서비스 인터페이스 |
+| Service Impl | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/service/impl/MapServiceImpl.java` | 페이징, 공공/민간 균형, 좌표 검증 |
+| DAO | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/dao/MapDao.java` | MyBatis mapper 인터페이스 |
+| VO | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/vo/JobPostingVO.java` | 채용공고 응답 |
+| VO | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/vo/MapSearchVO.java` | 검색 조건 |
+| VO | `backend/be-biz/src/main/java/kr/go/tkjf/usr/map/vo/MapCoordVO.java` | 좌표 저장 요청 |
 
 확인 사항:
 
-- 기존 잡아바 프로젝트의 component scan 대상에 Controller/Service 패키지가 포함되어야 합니다.
-- `MapDao`가 MyBatis mapper scan 대상에 포함되어야 합니다.
+- `fe-web`에는 화면 Controller와 정적 리소스/JSP만 배치하고, Service/DAO/Mapper/DB 의존성을 두지 않습니다.
+- `be-biz`의 component scan 대상에 Controller/Service 패키지가 포함되어야 합니다.
+- `be-biz`의 `MapDao`가 MyBatis mapper scan 대상에 포함되어야 합니다.
 - 기존 보안/인증 interceptor가 `/jobaba_map`, `/api/v1/map/**` 호출을 막지 않는지 확인해야 합니다.
-- 좌표 저장 API는 `POST` JSON 요청이므로 CSRF 정책이 있는 경우 예외 또는 토큰 처리가 필요합니다.
+- 좌표 저장 API는 `POST` JSON 요청이므로 CSRF 정책이 있는 경우 토큰 처리 또는 Origin/Referer 기반 대체 통제를 보안팀 기준에 맞춰 확정해야 합니다.
 
 ### 5.2 MyBatis mapper
 
 다음 XML을 잡아바 프로젝트의 MyBatis mapper 경로에 추가합니다.
 
-- `backend/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
+- `backend/core-domain/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
 
 기존 프로젝트 설정에 맞춰 `mapper-locations`에 포함되어야 합니다.
 
 현재 독립 앱 기준 설정:
 
 ```properties
-mybatis.mapper-locations=classpath:kr/go/tkjf/usr/map/dao/sql/*.xml
+mybatis.mapper-locations=classpath*:kr/go/tkjf/usr/map/dao/sql/*.xml
 ```
 
 잡아바 기존 프로젝트의 mapper 경로가 다르면 XML 위치 또는 설정을 맞춰야 합니다.
 
-### 5.3 정적 리소스
+### 5.3 JSP/정적 리소스
 
-현재 정적 리소스는 아래 위치에 있습니다.
+현재 JSP와 정적 리소스는 `fe-web` 아래에 있습니다.
 
 | 파일 | 역할 |
 |---|---|
-| `backend/src/main/resources/static/map/index.html` | 일자리맵 메인 화면 |
-| `backend/src/main/resources/static/map/css/map.css` | 일자리맵 CSS |
-| `backend/src/main/resources/static/map/js/map.js` | 지도, 필터, API 연동 JS |
-| `backend/src/main/resources/static/map/map-share.html` | 공유/확장 화면 |
+| `backend/fe-web/src/main/webapp/WEB-INF/jsp/map/index.jsp` | 일자리맵 메인 JSP 화면 |
+| `backend/fe-web/src/main/webapp/WEB-INF/jsp/map/map-share.jsp` | 공유/확장 JSP 화면 |
+| `backend/fe-web/src/main/resources/static/map/css/map.css` | 일자리맵 CSS |
+| `backend/fe-web/src/main/resources/static/map/js/map.js` | 지도, 필터, API 연동 JS |
+| `backend/fe-web/src/main/resources/static/map/js/kakao-key.js` | Kakao JavaScript 키 선택 |
 
 운영 URL을 `/jobaba_map`으로 가져갈 경우 개발팀 권장 배치는 다음 중 하나입니다.
 
 | 방식 | 설명 |
 |---|---|
-| 정적 리소스 경로 변경 | `/static/jobaba_map/index.html`, `/static/jobaba_map/css/map.css`, `/static/jobaba_map/js/map.js`로 배치 |
-| ResourceHandler 추가 | `/jobaba_map/**` 요청을 현재 `/static/map/**` 리소스로 매핑 |
+| JSP view 매핑 | `/jobaba_map` 요청을 `map/index.jsp`로 렌더링 |
+| 정적 리소스 경로 변경 | `/static/jobaba_map/css/map.css`, `/static/jobaba_map/js/map.js`로 배치 |
+| ResourceHandler 추가 | `/jobaba_map/**` 정적 요청을 현재 `/static/map/**` 리소스로 매핑 |
 
 중요:
 
 - 화면 URL은 `/jobaba_map` 또는 `/jobaba_map/`로 열리게 합니다.
 - CSS/JS 상대경로가 깨지지 않도록 실제 정적 리소스 URL 기준을 맞춰야 합니다.
-- 현재 `index.html`은 `css/map.css`, `js/map.js` 상대경로를 사용합니다.
-- `/jobaba_map`처럼 trailing slash 없이 접근할 경우 상대경로가 `/css/map.css`로 해석될 수 있으므로 `/jobaba_map/`로 redirect하거나 `<base>`/리소스 경로를 조정해야 합니다.
+- 현재 JSP는 `/map/css/...`, `/map/js/...` 절대경로를 사용합니다.
+- `fe-web`과 `be-biz`를 다른 origin으로 배치하면 `JOBABA_MAP_API_BASE_URL`, `JOBABA_MAP_CORS_ALLOWED_ORIGINS` 설정을 함께 맞춰야 합니다.
 
 ### 5.4 URL 매핑
 
@@ -225,7 +230,7 @@ mybatis.mapper-locations=classpath:kr/go/tkjf/usr/map/dao/sql/*.xml
 
 | 구분 | 현재 경로 |
 |---|---|
-| 페이지 | `/map`, `/map/index.html` |
+| 페이지 | `/map` |
 | 목록 API | `/api/v1/map/jobs` |
 | 상세 API | `/api/v1/map/jobs/{wantedAuthNo}` |
 | 좌표 미변환 API | `/api/v1/map/jobs/coord-pending` |
@@ -628,8 +633,8 @@ scripts/sync_v_job_posting.sh
 - 로컬 조회 객체 템플릿: `db/v_job_posting_local.sql`
 - NCS 매핑 테이블/데이터: `db/jobcls_ncs_map.sql`
 - 공공데이터포털 사업자번호 보강: `db/public_job_bizno_backfill.sql`
-- MyBatis mapper: `backend/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
-- 지도 프론트엔드: `backend/src/main/resources/static/map/js/map.js`
+- MyBatis mapper: `backend/core-domain/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`
+- 지도 프론트엔드: `backend/fe-web/src/main/resources/static/map/js/map.js`
 - 기능정의: `docs/feature-spec.md`
 
 ## 12. 소스코드 QA 결과 (2026-07-01 — 멀티 에이전트 검토)
@@ -758,7 +763,7 @@ WHERE j.WANTED_AUTH_NO = #{wantedAuthNo}
 
 | QA 일자 | 대상 | 결과 |
 |---|---|---|
-| 2026-06-26 | `http://localhost:8080/map/index.html` (브라우저) | Health Score 96/100 — ISSUE-001 deferred |
+| 2026-06-26 | `http://localhost:8080/map` (브라우저) | Health Score 96/100 — ISSUE-001 deferred |
 | 2026-07-01 | 소스코드 멀티 에이전트 정적 분석 (보안 + 코드 품질) | Critical 1건 / High 11건 발견 — 배포 차단 항목 5건 |
 | 2026-07-01 | 코딩 에이전트 3개 병렬 수정 적용 | 12건 수정완료 (배포차단 4건 + 권고 8건). 개발팀 이관: isSameOriginWrite 화이트리스트, 인증·인가 계층, 다중필터, 희망임금 필터, 보안헤더, HTTPS 강제, Kakao 운영 키 |
 
@@ -788,12 +793,11 @@ WHERE j.WANTED_AUTH_NO = #{wantedAuthNo}
 
 개발서버 재배포 전 다음 항목을 확인합니다.
 
-1. **jar 빌드**
+1. **모듈 빌드**
    ```bash
    cd backend && JAVA_HOME=/opt/homebrew/opt/openjdk@11 \
      PATH=/opt/homebrew/opt/openjdk@11/bin:$PATH \
-     ./gradlew bootJar
-   cp build/libs/*.jar ../tmp/jobaba_map_deploy/app.jar
+     ./gradlew :be-biz:bootJar :fe-web:bootWar
    ```
 
 2. **Kakao 도메인 등록 확인**

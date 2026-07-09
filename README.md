@@ -6,9 +6,11 @@
 
 ## 구성
 
-- `backend/`: Spring Boot 2.7, Java 11 기반 백엔드와 정적 지도 화면
-- `backend/src/main/resources/static/map/`: 지도 화면 HTML/CSS/JavaScript
-- `backend/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`: MyBatis 조회 SQL
+- `backend/`: Spring Boot 2.7, Java 11 기반 멀티모듈
+- `backend/fe-web/`: JSP 화면 채널, CSS/JavaScript 정적 리소스, 화면 Controller
+- `backend/be-biz/`: REST API, Service, DAO, DB 접근
+- `backend/core-domain/`: MyBatis SQL XML 등 도메인 리소스
+- `backend/core-domain/src/main/resources/kr/go/tkjf/usr/map/dao/sql/MapMapper.xml`: MyBatis 조회 SQL
 - `db/map_schema.sql`: 데이터 없는 스키마 전용 DDL
 - `db/v_job_posting_prod_template.sql`: 운영 DB 전환용 조회 객체 템플릿
 - `db/v_job_posting_local.sql`: 로컬 개발용 조회 객체
@@ -18,17 +20,18 @@
 
 ## 로컬 실행
 
-Java 11 환경에서 실행합니다.
+Java 11 환경에서 실행합니다. 로컬 기본 포트는 `fe-web` 8080, `be-biz` 8081입니다.
 
 ```bash
 cd backend
-./gradlew bootRun
+./gradlew :be-biz:bootRun
+./gradlew :fe-web:bootRun
 ```
 
 기본 URL은 다음과 같습니다.
 
 ```text
-http://localhost:8080/map/index.html
+http://localhost:8080/map
 ```
 
 DB 접속 정보는 환경변수로 주입합니다.

@@ -4,8 +4,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
-ROOT = Path(__file__).resolve().parents[1] / "backend" / "src" / "main" / "resources" / "static"
-BACKEND = "http://127.0.0.1:8080"
+ROOT = Path(__file__).resolve().parents[1] / "backend" / "fe-web" / "src" / "main" / "resources" / "static"
+BACKEND = "http://127.0.0.1:8081"
 PORT = 8082
 
 
@@ -48,6 +48,6 @@ class MapProxyHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     server = ThreadingHTTPServer(("127.0.0.1", PORT), MapProxyHandler)
-    print(f"Serving JOBABA MAP at http://127.0.0.1:{PORT}/map/index.html")
+    print(f"Serving JOBABA MAP static assets at http://127.0.0.1:{PORT}/map/")
     print(f"Proxying /api/* to {BACKEND}")
     server.serve_forever()

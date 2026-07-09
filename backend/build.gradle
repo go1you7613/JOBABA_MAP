@@ -1,48 +1,35 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.10'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-    id 'java'
+    id 'org.springframework.boot' version '2.7.10' apply false
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE' apply false
 }
 
-group = 'kr.go.tkjf'
-version = '1.0.0'
-sourceCompatibility = '11'
-targetCompatibility = '11'
+subprojects {
+    group = 'kr.go.tkjf'
+    version = '1.0.0'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
-}
 
-repositories {
-    mavenCentral()
-}
+    repositories {
+        mavenCentral()
+    }
 
-dependencies {
-    // Spring Boot Web
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
 
-    // Bean Validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // MyBatis
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
-
-    // MySQL (MariaDB 호환)
-    runtimeOnly 'com.mysql:mysql-connector-j'
-
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    // DevTools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-    // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 }
