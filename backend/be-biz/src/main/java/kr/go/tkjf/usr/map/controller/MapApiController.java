@@ -4,12 +4,12 @@ import kr.go.tkjf.usr.map.service.MapService;
 import kr.go.tkjf.usr.map.vo.JobPostingVO;
 import kr.go.tkjf.usr.map.vo.MapCoordVO;
 import kr.go.tkjf.usr.map.vo.MapSearchVO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
@@ -17,11 +17,12 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/api/v1/map")
-@RequiredArgsConstructor
 public class MapApiController {
 
-    private final MapService mapService;
-    private final MapOriginPolicy mapOriginPolicy;
+    @Resource
+    private MapService mapService;
+    @Resource
+    private MapOriginPolicy mapOriginPolicy;
 
     @GetMapping("/jobs")
     public ResponseEntity<List<JobPostingVO>> getJobList(@Valid MapSearchVO searchVO) {

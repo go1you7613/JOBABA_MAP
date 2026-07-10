@@ -5,6 +5,7 @@ import kr.go.tkjf.usr.map.vo.JobPostingVO;
 import kr.go.tkjf.usr.map.vo.MapCoordVO;
 import kr.go.tkjf.usr.map.vo.MapSearchVO;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,8 @@ class MapServiceImplTest {
     @Test
     void getJobListByViewportPassesRequestedPageAndSizeToDao() {
         CapturingMapDao mapDao = new CapturingMapDao();
-        MapServiceImpl service = new MapServiceImpl(mapDao);
+        MapServiceImpl service = new MapServiceImpl();
+        ReflectionTestUtils.setField(service, "mapDao", mapDao);
         MapSearchVO searchVO = new MapSearchVO();
         searchVO.setSwLat("36.6");
         searchVO.setSwLng("126.5");
@@ -35,7 +37,8 @@ class MapServiceImplTest {
     @Test
     void countJobListByViewportPassesNormalizedSearchToDao() {
         CapturingMapDao mapDao = new CapturingMapDao();
-        MapServiceImpl service = new MapServiceImpl(mapDao);
+        MapServiceImpl service = new MapServiceImpl();
+        ReflectionTestUtils.setField(service, "mapDao", mapDao);
         MapSearchVO searchVO = new MapSearchVO();
         searchVO.setSwLat("38.3");
         searchVO.setSwLng("128.0");
@@ -50,13 +53,12 @@ class MapServiceImplTest {
         assertThat(searchVO.getNeLat()).isEqualTo("38.3");
     }
 
-    private static class CapturingMapDao implements MapDao {
+    private static class CapturingMapDao extends MapDao {
         private int capturedPage;
         private int capturedSize;
         private int capturedOffset;
         private boolean countCalled;
 
-        @Override
         public List<JobPostingVO> selectJobListByViewport(MapSearchVO searchVO) {
             capturedPage = searchVO.getPage();
             capturedSize = searchVO.getSize();
@@ -64,28 +66,23 @@ class MapServiceImplTest {
             return Collections.emptyList();
         }
 
-        @Override
         public int countJobListByViewport(MapSearchVO searchVO) {
             countCalled = true;
             return 486;
         }
 
-        @Override
         public JobPostingVO selectJobDetail(String wantedAuthNo) {
             return null;
         }
 
-        @Override
         public int countJobPosting(String wantedAuthNo) {
             return 0;
         }
 
-        @Override
         public List<JobPostingVO> selectJobListWithoutCoord(MapSearchVO searchVO) {
             return Collections.emptyList();
         }
 
-        @Override
         public int insertCoord(MapCoordVO coordVO) {
             return 0;
         }

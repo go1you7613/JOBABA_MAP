@@ -1,2 +1,2 @@
 rootProject.name = 'jobaba-map'
-include 'fe-web', 'be-biz', 'core-domain'
+include 'fe-web', 'be-biz', 'core', 'core-domain'

@@ -15,12 +15,6 @@ public class MapController {
         this.apiBaseUrl = apiBaseUrl;
     }
 
-    @GetMapping("/")
-    public String rootPage(Model model) {
-        addMapAttributes("default", model);
-        return "map/index";
-    }
-
     // 일자리 맵 페이지 (팝업)
     @GetMapping("/map")
     public String mapPage(@RequestParam(required = false) String partner, Model model) {

@@ -10,22 +10,20 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
 
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
-
-    configurations {
-        compileOnly {
-            extendsFrom annotationProcessor
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:2.7.10'
         }
     }
+
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 

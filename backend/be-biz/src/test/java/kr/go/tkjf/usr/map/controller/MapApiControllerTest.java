@@ -6,6 +6,7 @@ import kr.go.tkjf.usr.map.vo.MapCoordVO;
 import kr.go.tkjf.usr.map.vo.MapSearchVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,9 @@ class MapApiControllerTest {
 
     @Test
     void getJobListReturnsTotalCountHeader() {
-        MapApiController controller = new MapApiController(new StubMapService(), new MapOriginPolicy(Collections.emptyList()));
+        MapApiController controller = new MapApiController();
+        ReflectionTestUtils.setField(controller, "mapService", new StubMapService());
+        ReflectionTestUtils.setField(controller, "mapOriginPolicy", new MapOriginPolicy(Collections.emptyList()));
 
         ResponseEntity<List<JobPostingVO>> response = controller.getJobList(new MapSearchVO());
 

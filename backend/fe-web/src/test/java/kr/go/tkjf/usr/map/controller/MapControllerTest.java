@@ -10,14 +10,6 @@ class MapControllerTest {
     private final MapController controller = new MapController("http://localhost:8081");
 
     @Test
-    void rootPageReturnsMapJspView() {
-        ConcurrentModel model = new ConcurrentModel();
-
-        assertThat(controller.rootPage(model)).isEqualTo("map/index");
-        assertThat(model.getAttribute("jobabaMapApiBaseUrl")).isEqualTo("http://localhost:8081");
-    }
-
-    @Test
     void mapPageReturnsMapJspViewAndDefaultPartner() {
         ConcurrentModel model = new ConcurrentModel();
 

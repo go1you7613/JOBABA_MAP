@@ -5,16 +5,13 @@ import kr.go.tkjf.usr.map.service.MapService;
 import kr.go.tkjf.usr.map.vo.JobPostingVO;
 import kr.go.tkjf.usr.map.vo.MapCoordVO;
 import kr.go.tkjf.usr.map.vo.MapSearchVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class MapServiceImpl implements MapService {
 
     private static final Set<String> SORT_TYPES = Set.of("regDt", "closeDt");
@@ -34,7 +31,8 @@ public class MapServiceImpl implements MapService {
     private static final Set<String> PRIVATE_EDUCATION_CODES = Set.of("0", "3", "4", "5", "7");
     private static final Set<String> PRIVATE_EMPLOYMENT_CODES = Set.of("1", "2", "3", "6", "7");
 
-    private final MapDao mapDao;
+    @Resource
+    private MapDao mapDao;
 
     @Override
     public List<JobPostingVO> getJobListByViewport(MapSearchVO searchVO) {
