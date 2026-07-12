@@ -3042,3 +3042,40 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 380px) {
+    .map-top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        overflow: visible;
+    }
+
+    .map-location-label {
+        align-self: flex-start;
+        max-width: 100%;
+        min-height: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .map-top-actions {
+        flex: 0 0 auto;
+        width: 100%;
+        gap: 6px;
+        overflow: visible;
+    }
+
+    .map-top-actions .btn-map-top {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .map-top-actions .radius-select {
+        flex: 1 1 90px;
+        min-width: 88px;
+        width: auto;
+    }
+}
