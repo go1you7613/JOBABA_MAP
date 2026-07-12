@@ -1958,7 +1958,16 @@
 
     function formatSal(tp, amt) {
         if (!amt) return '';
-        return amt === '협의' ? '급여협의' : ((tp || '') + ' ' + amt).trim();
+        var type = String(tp || '').trim();
+        var amount = String(amt).trim();
+        if (amount === '협의') return '급여협의';
+        if (type && /^\d[\d,]*(?:\s*~\s*\d[\d,]*)?$/.test(amount)) {
+            var unit = type === '연봉' || type === '월급' ? '만원' : '원';
+            amount = amount.split('~').map(function (value) {
+                return Number(value.replace(/,/g, '').trim()).toLocaleString('ko-KR') + unit;
+            }).join(' ~ ');
+        }
+        return (type + ' ' + amount).trim();
     }
 
     function isClosingSoon(dt) {
