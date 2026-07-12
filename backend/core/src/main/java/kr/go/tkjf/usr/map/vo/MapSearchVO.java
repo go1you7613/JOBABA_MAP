@@ -1,5 +1,6 @@
 package kr.go.tkjf.usr.map.vo;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -40,6 +41,12 @@ public class MapSearchVO {
     private List<@Pattern(regexp = "[1-4]") String> prvCareerCd = new ArrayList<>();
     private List<@Pattern(regexp = "[03457]") String> prvEduCd = new ArrayList<>();
     private List<@Pattern(regexp = "[12367]") String> prvEmpTpCd = new ArrayList<>();
+
+    // 희망 임금 (연봉/월급: 만원, 일급/시급: 원)
+    private String salaryType;
+    private Long salaryMin;
+    private Long salaryMax;
+    private boolean salaryNoCondition;
 
     // 정렬
     @Pattern(regexp = "|regDt|closeDt")
@@ -163,6 +170,57 @@ public class MapSearchVO {
 
     public void setPrvEmpTpCd(List<String> prvEmpTpCd) {
         this.prvEmpTpCd = prvEmpTpCd;
+    }
+
+    public String getSalaryType() {
+        return salaryType;
+    }
+
+    public void setSalaryType(String salaryType) {
+        this.salaryType = salaryType;
+    }
+
+    public Long getSalaryMin() {
+        return salaryMin;
+    }
+
+    public void setSalaryMin(Long salaryMin) {
+        this.salaryMin = salaryMin;
+    }
+
+    public Long getSalaryMax() {
+        return salaryMax;
+    }
+
+    public void setSalaryMax(Long salaryMax) {
+        this.salaryMax = salaryMax;
+    }
+
+    public boolean isSalaryNoCondition() {
+        return salaryNoCondition;
+    }
+
+    public void setSalaryNoCondition(boolean salaryNoCondition) {
+        this.salaryNoCondition = salaryNoCondition;
+    }
+
+    @AssertTrue(message = "희망 임금 범위가 올바르지 않습니다.")
+    public boolean isSalaryFilterValid() {
+        if (salaryNoCondition) {
+            return true;
+        }
+        if (salaryType != null && !salaryType.isBlank()
+                && !salaryType.matches("연봉|월급|일급|시급")) {
+            return false;
+        }
+        if ((salaryMin != null && salaryMin < 0) || (salaryMax != null && salaryMax < 0)) {
+            return false;
+        }
+        if ((salaryMin != null || salaryMax != null)
+                && (salaryType == null || salaryType.isBlank())) {
+            return false;
+        }
+        return salaryMin == null || salaryMax == null || salaryMin <= salaryMax;
     }
 
     public String getSortType() {

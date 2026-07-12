@@ -30,6 +30,7 @@ public class MapServiceImpl implements MapService {
     private static final Set<String> PRIVATE_CAREER_CODES = Set.of("1", "2", "3", "4");
     private static final Set<String> PRIVATE_EDUCATION_CODES = Set.of("0", "3", "4", "5", "7");
     private static final Set<String> PRIVATE_EMPLOYMENT_CODES = Set.of("1", "2", "3", "6", "7");
+    private static final Set<String> SALARY_TYPES = Set.of("연봉", "월급", "일급", "시급");
 
     @Resource
     private MapDao mapDao;
@@ -116,10 +117,32 @@ public class MapServiceImpl implements MapService {
         validateOptionalCodes(searchVO.getPrvCareerCd(), PRIVATE_CAREER_CODES, "민간 경력");
         validateOptionalCodes(searchVO.getPrvEduCd(), PRIVATE_EDUCATION_CODES, "민간 학력");
         validateOptionalCodes(searchVO.getPrvEmpTpCd(), PRIVATE_EMPLOYMENT_CODES, "민간 고용형태");
+        validateSalaryFilter(searchVO);
         if (isBlank(searchVO.getSortType())) {
             searchVO.setSortType("regDt");
         }
         validateOptionalCode(searchVO.getSortType(), SORT_TYPES, "정렬");
+    }
+
+    private void validateSalaryFilter(MapSearchVO searchVO) {
+        if (searchVO.isSalaryNoCondition()) {
+            searchVO.setSalaryType(null);
+            searchVO.setSalaryMin(null);
+            searchVO.setSalaryMax(null);
+            return;
+        }
+        validateOptionalCode(searchVO.getSalaryType(), SALARY_TYPES, "희망 임금 유형");
+        Long salaryMin = searchVO.getSalaryMin();
+        Long salaryMax = searchVO.getSalaryMax();
+        if ((salaryMin != null && salaryMin < 0) || (salaryMax != null && salaryMax < 0)) {
+            throw new IllegalArgumentException("희망 임금은 0 이상이어야 합니다.");
+        }
+        if ((salaryMin != null || salaryMax != null) && isBlank(searchVO.getSalaryType())) {
+            throw new IllegalArgumentException("희망 임금 범위를 지정하려면 임금 유형이 필요합니다.");
+        }
+        if (salaryMin != null && salaryMax != null && salaryMin > salaryMax) {
+            throw new IllegalArgumentException("희망 임금 최소값이 최대값보다 클 수 없습니다.");
+        }
     }
 
     private void validateOptionalCode(String value, Set<String> allowed, String label) {

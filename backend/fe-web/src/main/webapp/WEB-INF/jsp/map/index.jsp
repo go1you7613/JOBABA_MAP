@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="/map/css/map.css?v=20260702-multiselect-radius">
+    <link rel="stylesheet" href="/map/css/map.css?v=20260712-feature-request-v2">
 </head>
 <body data-theme="corporate">
 <div id="app">
@@ -17,10 +17,8 @@
     <!-- ======================== 상단 검색 바 ======================== -->
     <header class="search-header">
         <div class="header-logo">
-            <span class="logo-mark" aria-hidden="true">
-                <i data-lucide="map-pinned"></i>
-            </span>
-            <span class="logo-text">경기도일자리재단 일자리 맵</span>
+            <img class="logo-wordmark" src="/map/images/brand/jobaba-wordmark.svg" width="106" height="32" alt="" aria-hidden="true">
+            <span class="logo-text">잡아바 일자리맵</span>
         </div>
     </header>
 
@@ -91,8 +89,9 @@
                 <li class="skeleton-item"><div class="skeleton"></div></li>
             </ul>
             <div id="noResult" class="no-result hidden">
-                <p>검색 결과가 없습니다.</p>
-                <p class="no-result-sub">지도를 이동하거나 조건을 변경해 보세요.</p>
+                <img class="no-result-character" src="/map/images/brand/jobaba-empty-state.svg" width="251" height="240" alt="" aria-hidden="true">
+                <p>조건에 맞는 채용공고가 없습니다.</p>
+                <p class="no-result-sub">지도를 이동하거나 조건을 변경해보세요.</p>
             </div>
         </aside>
 
@@ -223,14 +222,14 @@
                     <div class="filter-row">
                         <span class="filter-label-col">고용형태</span>
                         <div class="filter-val-col filter-col2">
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="" id="pubEmpTpAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1010"> 정규직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1020"> 계약직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1030"> 무기계약직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1040"> 비정규직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1050"> 청년인턴</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1060"> 청년인턴(체험형)</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEmpTp" value="R1070"> 청년인턴(채용형)</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="" id="pubEmpTpAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1010"> 정규직</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1020"> 계약직</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1030"> 무기계약직</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1040"> 비정규직</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1050"> 청년인턴</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1060"> 청년인턴(체험형)</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="R1070"> 청년인턴(채용형)</label>
                         </div>
                     </div>
 
@@ -238,11 +237,11 @@
                     <div class="filter-row">
                         <span class="filter-label-col">경력</span>
                         <div class="filter-val-col">
-                            <label class="cb-label radio-label"><input type="radio" name="pubCareer" value="" id="pubCareerAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubCareer" value="R2010"> 신입</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubCareer" value="R2020"> 경력</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubCareer" value="R2030"> 신입+경력</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubCareer" value="R2040"> 외국인 전형</label>
+                            <label class="cb-label"><input type="checkbox" name="pubCareer" value="" id="pubCareerAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="pubCareer" value="R2010"> 신입</label>
+                            <label class="cb-label"><input type="checkbox" name="pubCareer" value="R2020"> 경력</label>
+                            <label class="cb-label"><input type="checkbox" name="pubCareer" value="R2030"> 신입+경력</label>
+                            <label class="cb-label"><input type="checkbox" name="pubCareer" value="R2040"> 외국인 전형</label>
                         </div>
                     </div>
 
@@ -250,14 +249,14 @@
                     <div class="filter-row filter-edu-row filter-row-last">
                         <span class="filter-label-col">학력</span>
                         <div class="filter-val-col filter-col2">
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="" id="pubEduAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7010"> 학력무관</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7020"> 중졸이하</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7030"> 고졸</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7040"> 대졸(2~3년)</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7050"> 대졸(4년)</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7060"> 석사</label>
-                            <label class="cb-label radio-label"><input type="radio" name="pubEdu" value="R7070"> 박사</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="" id="pubEduAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7010"> 학력무관</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7020"> 중졸이하</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7030"> 고졸</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7040"> 대졸(2~3년)</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7050"> 대졸(4년)</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7060"> 석사</label>
+                            <label class="cb-label"><input type="checkbox" name="pubEdu" value="R7070"> 박사</label>
                         </div>
                     </div>
 
@@ -288,12 +287,12 @@
                     <div class="filter-row">
                         <span class="filter-label-col">고용형태</span>
                         <div class="filter-val-col filter-col2">
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="" id="prvEmpTpAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="1"> 정규직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="2"> 계약직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="3"> 인턴직</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="6"> 프리랜서</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEmpTp" value="7"> 아르바이트</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="" id="prvEmpTpAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="1"> 정규직</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="2"> 계약직</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="3"> 인턴직</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="6"> 프리랜서</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="7"> 아르바이트</label>
                         </div>
                     </div>
 
@@ -301,11 +300,11 @@
                     <div class="filter-row">
                         <span class="filter-label-col">경력</span>
                         <div class="filter-val-col">
-                            <label class="cb-label radio-label"><input type="radio" name="prvCareer" value="" id="prvCareerAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvCareer" value="1"> 신입</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvCareer" value="2"> 경력</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvCareer" value="3"> 신입/경력</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvCareer" value="4"> 관계없음</label>
+                            <label class="cb-label"><input type="checkbox" name="prvCareer" value="" id="prvCareerAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="prvCareer" value="1"> 신입</label>
+                            <label class="cb-label"><input type="checkbox" name="prvCareer" value="2"> 경력</label>
+                            <label class="cb-label"><input type="checkbox" name="prvCareer" value="3"> 신입/경력</label>
+                            <label class="cb-label"><input type="checkbox" name="prvCareer" value="4"> 관계없음</label>
                         </div>
                     </div>
 
@@ -313,28 +312,45 @@
                     <div class="filter-row">
                         <span class="filter-label-col">학력</span>
                         <div class="filter-val-col filter-col2">
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="" id="prvEduAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="0"> 학력무관</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="3"> 고졸</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="4"> 대졸(2~3년)</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="5"> 대졸(4년)</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvEdu" value="7"> 박사</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="" id="prvEduAll" checked> 전체</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="0"> 학력무관</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="3"> 고졸</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="4"> 대졸(2~3년)</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="5"> 대졸(4년)</label>
+                            <label class="cb-label"><input type="checkbox" name="prvEdu" value="7"> 박사</label>
                         </div>
                     </div>
 
                     <!-- 희망임금 -->
                     <div class="filter-row filter-row-last">
                         <span class="filter-label-col">희망임금</span>
-                        <div class="filter-val-col filter-col2">
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="" id="prvSalAll" checked> 전체</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="01"> 면접 후 협의</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="02"> 2,500 이하</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="03"> 2,500~3,000</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="04"> 3,000~4,000</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="05"> 4,000~5,000</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="06"> 5,000~6,000</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="07"> 6,000~7,000</label>
-                            <label class="cb-label radio-label"><input type="radio" name="prvSal" value="08"> 7,000 이상</label>
+                        <div class="filter-salary" id="salaryFilter">
+                            <label class="salary-type-field" for="salaryType">
+                                <span>유형</span>
+                                <select id="salaryType" name="salaryType" class="select select-bordered select-sm sel-sal">
+                                    <option value="연봉">연봉</option>
+                                    <option value="월급">월급</option>
+                                    <option value="일급">일급</option>
+                                    <option value="시급">시급</option>
+                                </select>
+                            </label>
+                            <div class="salary-range">
+                                <label class="salary-range-field" for="salaryMin">
+                                    <span>최소</span>
+                                    <span class="salary-input-wrap">
+                                        <input id="salaryMin" name="salaryMin" class="input input-bordered input-sm input-sal" type="number" min="0" step="1" inputmode="numeric" placeholder="최소">
+                                        <span id="salaryMinUnit" class="salary-unit">만원</span>
+                                    </span>
+                                </label>
+                                <label class="salary-range-field" for="salaryMax">
+                                    <span>최대</span>
+                                    <span class="salary-input-wrap">
+                                        <input id="salaryMax" name="salaryMax" class="input input-bordered input-sm input-sal" type="number" min="0" step="1" inputmode="numeric" placeholder="최대">
+                                        <span id="salaryMaxUnit" class="salary-unit">만원</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <label class="cb-label salary-no-condition"><input type="checkbox" id="salaryNoCondition" name="salaryNoCondition" checked> 조건 없음</label>
                         </div>
                     </div>
 
@@ -405,7 +421,10 @@
     <div id="locationModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="locationModalTitle">
         <div class="modal-overlay"></div>
         <div class="modal-sheet modal-center bg-base-100 shadow-xl">
-            <div class="modal-icon">📍</div>
+            <div class="modal-character" aria-hidden="true">
+                <img class="modal-character-base" src="/map/images/brand/jobaba-onboarding-base.svg" alt="">
+                <img class="modal-character-overlay" src="/map/images/brand/jobaba-onboarding-overlay.svg" alt="">
+            </div>
             <h2 id="locationModalTitle">내 주변 일자리를 찾아볼까요?</h2>
             <p class="modal-desc">위치 정보를 허용하면 현재 위치 주변의<br>채용공고를 바로 확인할 수 있습니다.</p>
             <div class="modal-footer">
@@ -432,6 +451,6 @@
 </script>
 <script src="/map/js/kakao-key.js?v=20260629-closed-fix"></script>
 <script src="/map/js/map-location-data.js?v=20260629-closed-fix"></script>
-<script src="/map/js/map.js?v=20260702-multiselect-radius"></script>
+<script src="/map/js/map.js?v=20260712-feature-request-v2"></script>
 </body>
 </html>
