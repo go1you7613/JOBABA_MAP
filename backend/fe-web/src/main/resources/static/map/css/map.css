@@ -962,6 +962,7 @@ a { text-decoration: none; color: inherit; }
 
 #filterModal .filter-row {
     display: grid;
+    align-content: start;
     gap: 12px;
     padding: 14px;
     margin-bottom: 12px;
@@ -2915,6 +2916,14 @@ body {
 
 .logo-text {
     white-space: nowrap;
+}
+
+.logo-character {
+    display: block;
+    width: 44px;
+    height: 40px;
+    margin-left: 6px;
+    flex: 0 0 auto;
 }
 
 .modal-character {

@@ -19,6 +19,7 @@
         <div class="header-logo">
             <img class="logo-wordmark" src="/map/images/brand/jobaba-wordmark.svg" width="106" height="32" alt="" aria-hidden="true">
             <span class="logo-text">잡아바 일자리맵</span>
+            <img class="logo-character" src="/map/images/brand/jobaba-header-character.svg" width="44" height="40" alt="" aria-hidden="true">
         </div>
     </header>
 
