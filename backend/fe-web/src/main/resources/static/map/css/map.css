@@ -913,9 +913,25 @@ a { text-decoration: none; color: inherit; }
     align-items: stretch;
 }
 .filter-summary {
-    font-size: 12px;
-    color: var(--primary);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     padding: 4px 0;
+}
+.filter-summary.is-empty {
+    font-size: 12px;
+    color: var(--gray-600);
+}
+.filter-summary-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--primary-lt);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 .filter-footer-btns {
     display: flex;
@@ -957,6 +973,10 @@ a { text-decoration: none; color: inherit; }
 
 #filterModal .filter-row-last {
     margin-bottom: 0;
+}
+
+#filterModal #filterSectionPrv .filter-row-last {
+    grid-column: 1 / -1;
 }
 
 #filterModal .filter-section {
@@ -1058,6 +1078,52 @@ a { text-decoration: none; color: inherit; }
     height: 1px;
     opacity: 0;
     pointer-events: none;
+}
+
+/* 고용형태·경력·학력은 선택 상태를 버튼 배경이 아닌 체크박스로 표시한다. */
+#filterModal .filter-checkbox-row .cb-label {
+    min-height: 24px;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 2px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    text-align: left;
+    transition: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label input[type="checkbox"] {
+    position: static;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    border-radius: initial;
+    opacity: 1;
+    pointer-events: auto;
+    accent-color: auto;
+    transition: none;
+    animation: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label:has(input:checked) {
+    border-color: transparent;
+    background: transparent;
+    color: var(--gray-700);
+    box-shadow: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label:hover {
+    border-color: transparent;
+    color: var(--gray-700);
+    background: transparent;
+}
+
+#filterModal .filter-checkbox-row .cb-label:focus-within {
+    outline: 0;
 }
 
 #filterModal .cb-label:focus-within {
@@ -1360,7 +1426,7 @@ a { text-decoration: none; color: inherit; }
     .btn-research { top: 8px; }
 
     .header-logo { display: none; }
-    .modal-sheet { max-width: 100%; }
+    .modal-sheet:not(.modal-center) { max-width: 100%; }
 
     .modal-sheet-lg {
         width: 100%;
@@ -2853,7 +2919,7 @@ body {
 
 .modal-character {
     position: relative;
-    width: 150px;
+    width: 105px;
     aspect-ratio: 227 / 237;
     margin: 0 auto 16px;
 }
@@ -3002,7 +3068,7 @@ body {
     }
 
     .modal-character {
-        width: 132px;
+        width: 92px;
     }
 
     .no-result-character {

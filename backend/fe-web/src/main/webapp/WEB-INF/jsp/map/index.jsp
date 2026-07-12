@@ -219,7 +219,7 @@
                     </div>
 
                     <!-- 고용형태 -->
-                    <div class="filter-row">
+                    <div class="filter-row filter-checkbox-row">
                         <span class="filter-label-col">고용형태</span>
                         <div class="filter-val-col filter-col2">
                             <label class="cb-label"><input type="checkbox" name="pubEmpTp" value="" id="pubEmpTpAll" checked> 전체</label>
@@ -234,7 +234,7 @@
                     </div>
 
                     <!-- 경력 -->
-                    <div class="filter-row">
+                    <div class="filter-row filter-checkbox-row">
                         <span class="filter-label-col">경력</span>
                         <div class="filter-val-col">
                             <label class="cb-label"><input type="checkbox" name="pubCareer" value="" id="pubCareerAll" checked> 전체</label>
@@ -246,7 +246,7 @@
                     </div>
 
                     <!-- 학력 -->
-                    <div class="filter-row filter-edu-row filter-row-last">
+                    <div class="filter-row filter-checkbox-row filter-edu-row filter-row-last">
                         <span class="filter-label-col">학력</span>
                         <div class="filter-val-col filter-col2">
                             <label class="cb-label"><input type="checkbox" name="pubEdu" value="" id="pubEduAll" checked> 전체</label>
@@ -284,7 +284,7 @@
                     </div>
 
                     <!-- 고용형태 -->
-                    <div class="filter-row">
+                    <div class="filter-row filter-checkbox-row">
                         <span class="filter-label-col">고용형태</span>
                         <div class="filter-val-col filter-col2">
                             <label class="cb-label"><input type="checkbox" name="prvEmpTp" value="" id="prvEmpTpAll" checked> 전체</label>
@@ -297,7 +297,7 @@
                     </div>
 
                     <!-- 경력 -->
-                    <div class="filter-row">
+                    <div class="filter-row filter-checkbox-row">
                         <span class="filter-label-col">경력</span>
                         <div class="filter-val-col">
                             <label class="cb-label"><input type="checkbox" name="prvCareer" value="" id="prvCareerAll" checked> 전체</label>
@@ -309,7 +309,7 @@
                     </div>
 
                     <!-- 학력 -->
-                    <div class="filter-row">
+                    <div class="filter-row filter-checkbox-row filter-row-last">
                         <span class="filter-label-col">학력</span>
                         <div class="filter-val-col filter-col2">
                             <label class="cb-label"><input type="checkbox" name="prvEdu" value="" id="prvEduAll" checked> 전체</label>
@@ -321,44 +321,11 @@
                         </div>
                     </div>
 
-                    <!-- 희망임금 -->
-                    <div class="filter-row filter-row-last">
-                        <span class="filter-label-col">희망임금</span>
-                        <div class="filter-salary" id="salaryFilter">
-                            <label class="salary-type-field" for="salaryType">
-                                <span>유형</span>
-                                <select id="salaryType" name="salaryType" class="select select-bordered select-sm sel-sal">
-                                    <option value="연봉">연봉</option>
-                                    <option value="월급">월급</option>
-                                    <option value="일급">일급</option>
-                                    <option value="시급">시급</option>
-                                </select>
-                            </label>
-                            <div class="salary-range">
-                                <label class="salary-range-field" for="salaryMin">
-                                    <span>최소</span>
-                                    <span class="salary-input-wrap">
-                                        <input id="salaryMin" name="salaryMin" class="input input-bordered input-sm input-sal" type="number" min="0" step="1" inputmode="numeric" placeholder="최소">
-                                        <span id="salaryMinUnit" class="salary-unit">만원</span>
-                                    </span>
-                                </label>
-                                <label class="salary-range-field" for="salaryMax">
-                                    <span>최대</span>
-                                    <span class="salary-input-wrap">
-                                        <input id="salaryMax" name="salaryMax" class="input input-bordered input-sm input-sal" type="number" min="0" step="1" inputmode="numeric" placeholder="최대">
-                                        <span id="salaryMaxUnit" class="salary-unit">만원</span>
-                                    </span>
-                                </label>
-                            </div>
-                            <label class="cb-label salary-no-condition"><input type="checkbox" id="salaryNoCondition" name="salaryNoCondition" checked> 조건 없음</label>
-                        </div>
-                    </div>
-
                 </div><!-- /filterSectionPrv -->
 
             </div>
             <div class="modal-footer filter-footer">
-                <div id="filterSummary" class="filter-summary">검색조건을 선택해 주세요.</div>
+                <div id="filterSummary" class="filter-summary is-empty">검색조건을 선택해 주세요.</div>
                 <div class="filter-footer-btns">
                     <button id="filterResetBtn" class="btn btn-outline btn-secondary">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
@@ -422,8 +389,8 @@
         <div class="modal-overlay"></div>
         <div class="modal-sheet modal-center bg-base-100 shadow-xl">
             <div class="modal-character" aria-hidden="true">
-                <img class="modal-character-base" src="/map/images/brand/jobaba-onboarding-base.svg" alt="">
-                <img class="modal-character-overlay" src="/map/images/brand/jobaba-onboarding-overlay.svg" alt="">
+                <img class="modal-character-base" src="/map/images/brand/jobaba-onboarding-base.svg" alt="" width="227" height="234">
+                <img class="modal-character-overlay" src="/map/images/brand/jobaba-onboarding-overlay.svg" alt="" width="136" height="161">
             </div>
             <h2 id="locationModalTitle">내 주변 일자리를 찾아볼까요?</h2>
             <p class="modal-desc">위치 정보를 허용하면 현재 위치 주변의<br>채용공고를 바로 확인할 수 있습니다.</p>

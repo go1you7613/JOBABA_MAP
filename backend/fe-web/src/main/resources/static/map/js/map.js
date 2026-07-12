@@ -193,6 +193,7 @@
     var $salaryNoCondition = $('salaryNoCondition');
 
     document.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+        if (input.closest('.filter-checkbox-row')) return;
         input.classList.add('checkbox', 'checkbox-primary', 'checkbox-xs');
     });
 
@@ -1181,6 +1182,7 @@
             if ($pub) $pub.classList.toggle('hidden', state.sourceType !== 'PUB');
             if ($prv) $prv.classList.toggle('hidden', state.sourceType !== 'PRV');
             populatePanelSelects();
+            updateFilterSummaryPreview();
         });
     });
 
@@ -1224,8 +1226,20 @@
     bindAllCheckbox('prvCareerAll', 'prvCareer');
     bindAllCheckbox('prvEduAll',    'prvEdu');
 
-    if ($salaryType) $salaryType.addEventListener('change', syncSalaryControls);
-    if ($salaryNoCondition) $salaryNoCondition.addEventListener('change', syncSalaryControls);
+    document.querySelectorAll('#filterModal input[type="checkbox"]').forEach(function (checkbox) {
+        checkbox.addEventListener('change', updateFilterSummaryPreview);
+    });
+    if ($salaryType) $salaryType.addEventListener('change', function () {
+        syncSalaryControls();
+        updateFilterSummaryPreview();
+    });
+    if ($salaryNoCondition) $salaryNoCondition.addEventListener('change', function () {
+        syncSalaryControls();
+        updateFilterSummaryPreview();
+    });
+    [$salaryMin, $salaryMax].forEach(function (input) {
+        if (input) input.addEventListener('input', updateFilterSummaryPreview);
+    });
     syncSalaryControls();
 
     $filterResetBtn.addEventListener('click', resetFilter);
@@ -1438,11 +1452,12 @@
         return state.salaryNoCondition ? 0 : 1;
     }
 
-    function formatSalaryFilterSummary() {
-        var type = state.salaryType || '연봉';
+    function formatSalaryFilterSummary(filterState) {
+        filterState = filterState || state;
+        var type = filterState.salaryType || '연봉';
         var unit = getSalaryUnit(type);
-        var min = state.salaryMin ? Number(state.salaryMin).toLocaleString('ko-KR') : '';
-        var max = state.salaryMax ? Number(state.salaryMax).toLocaleString('ko-KR') : '';
+        var min = filterState.salaryMin ? Number(filterState.salaryMin).toLocaleString('ko-KR') : '';
+        var max = filterState.salaryMax ? Number(filterState.salaryMax).toLocaleString('ko-KR') : '';
         if (min && max) return '희망임금: ' + type + ' ' + min + '~' + max + unit;
         if (min) return '희망임금: ' + type + ' ' + min + unit + ' 이상';
         if (max) return '희망임금: ' + type + ' ' + max + unit + ' 이하';
@@ -1548,21 +1563,54 @@
         return match ? parseInt(match[0], 10) : 0;
     }
 
-    function updateFilterSummary() {
+    function updateFilterSummary(filterState, sourceType) {
+        filterState = filterState || state;
+        sourceType = sourceType || state.sourceType;
         var parts = [];
-        if (state.sourceType === 'PRV') {
-            if (state.prvJobCds.length)    parts.push('직종 ' + state.prvJobCds.length + '개');
-            if (state.prvEmpTpCds.length)  parts.push('고용형태: ' + state.prvEmpTpCds.map(function (c) { return getCommonCodeLabel('prvEmpTp', c); }).join('/'));
-            if (state.prvCareerCds.length) parts.push('경력: ' + state.prvCareerCds.map(function (c) { return getCommonCodeLabel('prvCareer', c); }).join('/'));
-            if (state.prvEduCds.length)    parts.push('학력: ' + state.prvEduCds.map(function (c) { return getCommonCodeLabel('prvEdu', c); }).join('/'));
-            if (getSalaryFilterCount())    parts.push(formatSalaryFilterSummary());
+        if (sourceType === 'PRV') {
+            if (filterState.prvJobCds.length)    parts.push('직종 ' + filterState.prvJobCds.length + '개');
+            if (filterState.prvEmpTpCds.length)  parts.push('고용형태: ' + filterState.prvEmpTpCds.map(function (c) { return getCommonCodeLabel('prvEmpTp', c); }).join('/'));
+            if (filterState.prvCareerCds.length) parts.push('경력: ' + filterState.prvCareerCds.map(function (c) { return getCommonCodeLabel('prvCareer', c); }).join('/'));
+            if (filterState.prvEduCds.length)    parts.push('학력: ' + filterState.prvEduCds.map(function (c) { return getCommonCodeLabel('prvEdu', c); }).join('/'));
+            if (!filterState.salaryNoCondition)  parts.push(formatSalaryFilterSummary(filterState));
         } else {
-            if (state.pubNcsCds.length)    parts.push('직종(NCS) ' + state.pubNcsCds.length + '개');
-            if (state.pubEmpTpCds.length)  parts.push('고용형태: ' + state.pubEmpTpCds.map(function (c) { return getCommonCodeLabel('empTp', c); }).join('/'));
-            if (state.pubCareerCds.length) parts.push('경력: ' + state.pubCareerCds.map(function (c) { return getCommonCodeLabel('career', c); }).join('/'));
-            if (state.pubEduCds.length)    parts.push('학력: ' + state.pubEduCds.map(function (c) { return getCommonCodeLabel('edubg', c); }).join('/'));
+            if (filterState.pubNcsCds.length)    parts.push('직종(NCS) ' + filterState.pubNcsCds.length + '개');
+            if (filterState.pubEmpTpCds.length)  parts.push('고용형태: ' + filterState.pubEmpTpCds.map(function (c) { return getCommonCodeLabel('empTp', c); }).join('/'));
+            if (filterState.pubCareerCds.length) parts.push('경력: ' + filterState.pubCareerCds.map(function (c) { return getCommonCodeLabel('career', c); }).join('/'));
+            if (filterState.pubEduCds.length)    parts.push('학력: ' + filterState.pubEduCds.map(function (c) { return getCommonCodeLabel('edubg', c); }).join('/'));
         }
-        $filterSummary.textContent = parts.length ? parts.join(' · ') : '검색조건을 선택해 주세요.';
+        $filterSummary.innerHTML = '';
+        if (!parts.length) {
+            $filterSummary.classList.add('is-empty');
+            $filterSummary.textContent = '검색조건을 선택해 주세요.';
+            return;
+        }
+        $filterSummary.classList.remove('is-empty');
+        parts.forEach(function (part) {
+            var tag = document.createElement('span');
+            tag.className = 'filter-summary-tag';
+            tag.textContent = part;
+            $filterSummary.appendChild(tag);
+        });
+    }
+
+    function updateFilterSummaryPreview() {
+        var activeFilterTab = document.querySelector('.filter-src-tab-active');
+        var previewState = {
+            pubNcsCds: getCheckedValues('pubNcs'),
+            pubEmpTpCds: getCheckedValues('pubEmpTp'),
+            pubCareerCds: getCheckedValues('pubCareer'),
+            pubEduCds: getCheckedValues('pubEdu'),
+            prvJobCds: getCheckedValues('prvJob'),
+            prvEmpTpCds: getCheckedValues('prvEmpTp'),
+            prvCareerCds: getCheckedValues('prvCareer'),
+            prvEduCds: getCheckedValues('prvEdu'),
+            salaryNoCondition: !$salaryNoCondition || $salaryNoCondition.checked,
+            salaryType: $salaryType ? $salaryType.value : '',
+            salaryMin: $salaryMin ? $salaryMin.value.trim() : '',
+            salaryMax: $salaryMax ? $salaryMax.value.trim() : ''
+        };
+        updateFilterSummary(previewState, activeFilterTab ? activeFilterTab.dataset.src : state.sourceType);
     }
 
     /* ─── 상세 닫기 ─── */
