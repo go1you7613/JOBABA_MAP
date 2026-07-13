@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="/map/css/map.css?v=20260712-feature-request-v2">
+    <link rel="stylesheet" href="/map/css/map.css?v=20260713-rotation-fix">
 </head>
 <body data-theme="corporate">
 <div id="app">
@@ -17,9 +17,7 @@
     <!-- ======================== 상단 검색 바 ======================== -->
     <header class="search-header">
         <div class="header-logo">
-            <img class="logo-wordmark" src="/map/images/brand/jobaba-wordmark.svg" width="106" height="32" alt="" aria-hidden="true">
-            <span class="logo-text">잡아바 일자리맵</span>
-            <img class="logo-character" src="/map/images/brand/jobaba-header-character.svg" width="44" height="40" alt="" aria-hidden="true">
+            <img class="logo-map" src="/map/images/brand/jobaba-map-logo.png" width="267" height="64" alt="잡아바 일자리맵">
         </div>
     </header>
 
@@ -419,6 +417,6 @@
 </script>
 <script src="/map/js/kakao-key.js?v=20260629-closed-fix"></script>
 <script src="/map/js/map-location-data.js?v=20260629-closed-fix"></script>
-<script src="/map/js/map.js?v=20260712-feature-request-v2"></script>
+<script src="/map/js/map.js?v=20260713-rotation-fix"></script>
 </body>
 </html>

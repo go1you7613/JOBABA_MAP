@@ -46,6 +46,7 @@
         loadingMoreJobs: false,
         mapReady: false,
         mapFailed: false,
+        mobileListMapViewport: null,
         locationLabelOverride: '',
         // 위치 재선택
         selectedSido: '',
@@ -245,7 +246,10 @@
         });
         state.mapReady = true;
         // idle 이벤트마다 자동 재검색 (고용24 방식)
-        kakao.maps.event.addListener(state.map, 'idle', loadJobs);
+        kakao.maps.event.addListener(state.map, 'idle', function () {
+            if ($mainLayout && $mainLayout.classList.contains('mobile-list-view')) return;
+            loadJobs();
+        });
         kakao.maps.event.addListener(state.map, 'dragstart', function () {
             state.locationLabelOverride = '';
         });
@@ -906,6 +910,14 @@
     function setMobileView(view) {
         if (!$mainLayout) return;
         var isList = view === 'list';
+        if (isList && state.mapReady && state.map && window.kakao) {
+            var center = state.map.getCenter();
+            state.mobileListMapViewport = {
+                lat: center.getLat(),
+                lng: center.getLng(),
+                level: state.map.getLevel()
+            };
+        }
         $mainLayout.classList.toggle('mobile-list-view', isList);
         $mainLayout.classList.toggle('mobile-map-view', !isList);
         if ($mobileMapViewBtn) {
@@ -918,7 +930,18 @@
         }
         if (!isList && state.mapReady && state.map && window.kakao) {
             setTimeout(function () {
-                kakao.maps.event.trigger(state.map, 'resize');
+                if (typeof state.map.relayout === 'function') {
+                    state.map.relayout();
+                } else {
+                    kakao.maps.event.trigger(state.map, 'resize');
+                }
+                if (state.mobileListMapViewport) {
+                    state.map.setLevel(state.mobileListMapViewport.level);
+                    state.map.setCenter(new kakao.maps.LatLng(
+                        state.mobileListMapViewport.lat,
+                        state.mobileListMapViewport.lng
+                    ));
+                }
             }, 0);
         }
     }

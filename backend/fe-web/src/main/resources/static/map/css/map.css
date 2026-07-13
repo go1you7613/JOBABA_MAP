@@ -27,7 +27,7 @@ a { text-decoration: none; color: inherit; }
     --gray-700:   #374151;
     --gray-900:   #111827;
     --white:      #ffffff;
-    --header-h:   56px;
+    --header-h:   72px;
     --panel-w:    340px;
     --radius-sm:  6px;
     --radius-md:  10px;
@@ -70,8 +70,6 @@ a { text-decoration: none; color: inherit; }
 }
 
 .header-logo { flex-shrink: 0; }
-.logo-text { font-size: 16px; color: var(--gray-700); letter-spacing: -.5px; }
-.logo-text strong { color: var(--primary); }
 
 .search-wrap {
     flex: 1;
@@ -1327,7 +1325,7 @@ a { text-decoration: none; color: inherit; }
 .job-marker-count { display: inline-block; margin-left: 3px; }
 
 /* ── Responsive: Mobile ── */
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     :root { --panel-w: 0px; }
 
     html, body, #app { width: 100%; max-width: 100%; }
@@ -1554,14 +1552,6 @@ body {
     width: 24px;
     height: 24px;
     stroke-width: 2.4;
-}
-
-.logo-text {
-    color: var(--text-strong);
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: 0;
-    word-break: keep-all;
 }
 
 .search-wrap {
@@ -2535,7 +2525,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     :root {
         --panel-w: 0px;
         --header-h: 64px;
@@ -2555,19 +2545,6 @@ body {
     .logo-mark {
         width: 28px;
         height: 28px;
-    }
-
-    .logo-text {
-        max-width: 72px;
-        font-size: 0;
-        line-height: 1.2;
-    }
-
-    .logo-text::after {
-        content: '일자리 맵';
-        color: var(--text-strong);
-        font-size: 15px;
-        font-weight: 900;
     }
 
     .search-wrap {
@@ -2840,7 +2817,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     #filterModal {
         inset: var(--header-h) 0 0 0;
         width: 100vw;
@@ -2904,25 +2881,14 @@ body {
    기능 구현 요청 v2 — 브랜드, 빈 상태, 급여 필터, 모바일 범례
    ============================================================ */
 .header-logo {
-    gap: 14px;
+    width: auto;
+    min-width: 0;
 }
 
-.logo-wordmark {
+.logo-map {
     display: block;
-    width: 106px;
-    height: auto;
-    flex: 0 0 auto;
-}
-
-.logo-text {
-    white-space: nowrap;
-}
-
-.logo-character {
-    display: block;
-    width: 44px;
-    height: 40px;
-    margin-left: 6px;
+    width: auto;
+    height: 64px;
     flex: 0 0 auto;
 }
 
@@ -3060,20 +3026,10 @@ body {
     opacity: .55;
 }
 
-@media (max-width: 768px) {
-    .logo-wordmark {
-        width: 78px;
-    }
-
-    .logo-text {
-        max-width: none;
-        font-size: 15px;
-        line-height: 1.2;
-    }
-
-    .logo-text::after {
-        display: none;
-        content: none;
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
+    .logo-map {
+        width: auto;
+        height: 42px;
     }
 
     .modal-character {
