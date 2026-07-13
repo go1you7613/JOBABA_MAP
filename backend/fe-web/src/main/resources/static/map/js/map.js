@@ -63,7 +63,7 @@
     var LIST_SCROLL_THRESHOLD = 160;
     var GEOCODE_BATCH_SIZE = 20;
     var DEFAULT_LAT = 37.4138, DEFAULT_LNG = 127.5183;
-    var DEFAULT_LEVEL = 9;
+    var DEFAULT_LEVEL = 7;
     var KAKAO_JS_KEY = window.JobabaMapKakaoKey.selectKakaoJsKey(window.location.href);
     var COMMON_CODES = {
         // 공공 (R코드)
