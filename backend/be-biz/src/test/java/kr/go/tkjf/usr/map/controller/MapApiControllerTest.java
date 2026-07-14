@@ -2,10 +2,12 @@ package kr.go.tkjf.usr.map.controller;
 
 import kr.go.tkjf.usr.map.service.MapService;
 import kr.go.tkjf.usr.map.vo.JobPostingVO;
+import kr.go.tkjf.usr.map.vo.MapApiRequest;
+import kr.go.tkjf.usr.map.vo.MapApiResponse;
 import kr.go.tkjf.usr.map.vo.MapCoordVO;
+import kr.go.tkjf.usr.map.vo.MapJobListResVo;
 import kr.go.tkjf.usr.map.vo.MapSearchVO;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
@@ -16,15 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MapApiControllerTest {
 
     @Test
-    void getJobListReturnsTotalCountHeader() {
+    void getJobListReturnsBodyWithTotalCount() {
         MapApiController controller = new MapApiController();
         ReflectionTestUtils.setField(controller, "mapService", new StubMapService());
-        ReflectionTestUtils.setField(controller, "mapOriginPolicy", new MapOriginPolicy(Collections.emptyList()));
 
-        ResponseEntity<List<JobPostingVO>> response = controller.getJobList(new MapSearchVO());
+        MapApiResponse<MapJobListResVo> response = controller.getJobList(new MapApiRequest<>(new MapSearchVO()));
 
-        assertThat(response.getHeaders().getFirst("X-Total-Count")).isEqualTo("486");
-        assertThat(response.getBody()).hasSize(1);
+        assertThat(response.getBody().getTotalCount()).isEqualTo(486);
+        assertThat(response.getBody().getJobs()).hasSize(1);
     }
 
     private static class StubMapService implements MapService {

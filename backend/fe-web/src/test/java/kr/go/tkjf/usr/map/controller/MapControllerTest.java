@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MapControllerTest {
 
-    private final MapController controller = new MapController("http://localhost:8081");
+    private final MapController controller = new MapController();
 
     @Test
     void mapPageReturnsMapJspViewAndDefaultPartner() {

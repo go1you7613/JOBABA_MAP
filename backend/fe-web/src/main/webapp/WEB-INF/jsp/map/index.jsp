@@ -410,11 +410,6 @@
 
 </div><!-- /#app -->
 
-<script>
-    window.JobabaMapConfig = {
-        apiBaseUrl: '<c:out value="${jobabaMapApiBaseUrl}" />'
-    };
-</script>
 <script src="/map/js/kakao-key.js?v=20260629-closed-fix"></script>
 <script src="/map/js/map-location-data.js?v=20260629-closed-fix"></script>
 <script src="/map/js/map.js?v=20260713-rotation-fix"></script>

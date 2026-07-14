@@ -7,8 +7,6 @@
     var LOCATION_DATA = window.JobabaMapLocationData || { REGION_DATA: {}, SUBWAY_DATA: {} };
     var REGION_DATA = LOCATION_DATA.REGION_DATA;
     var SUBWAY_DATA = LOCATION_DATA.SUBWAY_DATA;
-    var MAP_CONFIG = window.JobabaMapConfig || {};
-    var API_BASE_URL = normalizeApiBaseUrl(MAP_CONFIG.apiBaseUrl);
 
     /* ─── 상태 ─── */
     var state = {
@@ -120,12 +118,8 @@
         R600025: ['110','121','122']
     };
 
-    function normalizeApiBaseUrl(value) {
-        return typeof value === 'string' ? value.replace(/\/+$/, '') : '';
-    }
-
     function apiUrl(path) {
-        return API_BASE_URL + path;
+        return path;
     }
 
     /* ─── DOM ─── */

@@ -8,10 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "JOBABA_MAP_API_BASE_URL="
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JobabaMapFeWebApplicationTest {
 
     @Autowired
@@ -22,6 +19,6 @@ class JobabaMapFeWebApplicationTest {
         ResponseEntity<String> response = restTemplate.getForEntity("/map", String.class);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody()).contains("window.JobabaMapConfig");
+        assertThat(response.getBody()).contains("/map/js/map.js");
     }
 }
