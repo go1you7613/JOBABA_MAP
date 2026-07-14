@@ -1877,8 +1877,8 @@
                 if (status === kakao.maps.services.Status.OK) {
                     state.locationLabelOverride = '';
                     var r = result[0];
-                    setRadiusKm(20);
-                    moveMapAndReload(r.y, r.x, 9);
+                    setRadiusKm(5);
+                    moveMapAndReload(r.y, r.x, 7);
                     $currentLocationName.textContent = state.selectedSigungu || state.selectedSido;
                 } else { showToast('해당 지역을 지도에서 찾을 수 없습니다.'); }
             });
@@ -1897,6 +1897,7 @@
                 if (status === kakao.maps.services.Status.OK && result.length) {
                     state.locationLabelOverride = state.selectedStation + '역';
                     var r2 = result[0];
+                    setRadiusKm(5);
                     moveMapAndReload(r2.y, r2.x, 6);
                     $currentLocationName.textContent = state.selectedStation + '역';
                     closeLocReselect();
@@ -1906,6 +1907,7 @@
                         if (addrStatus === kakao.maps.services.Status.OK && addrResult.length) {
                             state.locationLabelOverride = state.selectedStation + '역';
                             var r3 = addrResult[0];
+                            setRadiusKm(5);
                             moveMapAndReload(r3.y, r3.x, 6);
                             $currentLocationName.textContent = state.selectedStation + '역';
                             closeLocReselect();
