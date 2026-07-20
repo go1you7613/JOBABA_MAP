@@ -29,15 +29,11 @@ docs/**
 !docs/
 !docs/SECURITY/
 !docs/SECURITY/*.md
-!docs/data/
-!docs/data/db-structure-map-service.md
-!docs/operation-handoff-map-service.md
+!docs/developer-handoff-source-boundary.md
 
-# DB data/demo files. GitHub handoff exposes schema-only SQL.
+# DB data/demo files. GitHub handoff exposes MAP-only schema and read-only contract SQL.
 db/*.sql
 db/*.py
 !db/map_schema.sql
-!db/v_job_posting_local.sql
 !db/v_job_posting_prod_template.sql
-!db/work24_public_job_schema.sql
 db/__pycache__/
