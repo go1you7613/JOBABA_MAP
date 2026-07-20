@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="map">
+
+    <sql id="activeViewportJobWhere">
+        WHERE c.GEOCODE_YN = 'Y'
+          AND j.USE_YN = 'Y'
+          AND j.DEL_YN = 'N'
+          AND c.LAT BETWEEN #{swLat} AND #{neLat}
+          AND c.LNG BETWEEN #{swLng} AND #{neLng}
+          AND (
+              j.CLOSE_DT IS NULL
+              OR TRIM(j.CLOSE_DT) = ''
+              OR TRIM(j.CLOSE_DT) IN ('상시채용', '채용시까지')
+              OR TRIM(j.CLOSE_DT) NOT REGEXP '^[0-9]{4}[-.]?[0-9]{1,2}[-.]?[0-9]{1,2}$'
+              OR (
+                  CASE
+                      WHEN TRIM(j.CLOSE_DT) REGEXP '^[0-9]{8}$'
+                          THEN STR_TO_DATE(TRIM(j.CLOSE_DT), '%Y%m%d')
+                      ELSE STR_TO_DATE(REPLACE(TRIM(j.CLOSE_DT), '.', '-'), '%Y-%c-%e')
+                  END
+              ) >= CURDATE()
+          )
+        <include refid="jobSearchFilters"/>
+    </sql>
+
+    <sql id="openJobOnlyWhere">
+        AND (
+            j.CLOSE_DT IS NULL
+            OR TRIM(j.CLOSE_DT) = ''
+            OR TRIM(j.CLOSE_DT) IN ('상시채용', '채용시까지')
+            OR TRIM(j.CLOSE_DT) NOT REGEXP '^[0-9]{4}[-.]?[0-9]{1,2}[-.]?[0-9]{1,2}$'
+            OR (
+                CASE
+                    WHEN TRIM(j.CLOSE_DT) REGEXP '^[0-9]{8}$'
+                        THEN STR_TO_DATE(TRIM(j.CLOSE_DT), '%Y%m%d')
+                    ELSE STR_TO_DATE(REPLACE(TRIM(j.CLOSE_DT), '.', '-'), '%Y-%c-%e')
+                END
+            ) >= CURDATE()
+        )
+    </sql>
+
+    <sql id="jobSearchFilters">
+        <!-- 채널 선택 -->
+        <if test="sourceType == 'PUB'">
+            AND j.SOURCE_TYPE COLLATE utf8mb4_unicode_ci = '공공' COLLATE utf8mb4_unicode_ci
+        </if>
+        <if test="sourceType == 'PRV'">
+            AND j.SOURCE_TYPE COLLATE utf8mb4_unicode_ci = '민간' COLLATE utf8mb4_unicode_ci
+        </if>
+        <!-- 키워드 -->
+        <if test="keyword != null and keyword != ''">
+            AND (j.COMPANY LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\\'
+              OR j.TITLE   LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\\'
+              OR j.JOBS_NM LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\\')
+        </if>
+        <!-- 공공 필터: NCS↔잡아바 매핑 대응 -->
+        <if test="sourceType == 'PUB' and jobNcsCd != null and jobNcsCd.size() > 0">
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM jwrki.tb_jobcls_ncs_map m
+                    WHERE m.NCS_CD IN
+                    <foreach collection="jobNcsCd" item="code" open="(" separator="," close=")">
+                        #{code}
+                    </foreach>
+                      AND m.JOBABA_GRP_CD = 'CMMN_276'
+                      AND m.JOBABA_CD = j.JOBABA_CMMN_276_CD
+                      AND m.USE_YN = 'Y'
+                )
+                OR (
+                <foreach collection="jobNcsCd" item="code" separator=" OR ">
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOBS_CD, ''), ' ', '')) > 0
+                </foreach>
+                )
+            )
+        </if>
+        <if test="sourceType == 'PUB' and jobCareerCd != null and jobCareerCd.size() > 0">
+            AND (
+            <foreach collection="jobCareerCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(SUBSTRING(#{code}, 4, 1), REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(CONCAT('0', SUBSTRING(#{code}, 4, 1)), REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0
+                    OR (#{code} = 'R2010' AND TRIM(COALESCE(j.CAREER, '')) = '신입')
+                    OR (#{code} = 'R2020' AND TRIM(COALESCE(j.CAREER, '')) = '경력')
+                    OR (#{code} = 'R2030' AND REPLACE(TRIM(COALESCE(j.CAREER, '')), ' ', '') IN ('신입/경력', '신입+경력'))
+                    OR (#{code} = 'R2040' AND REPLACE(TRIM(COALESCE(j.CAREER, '')), ' ', '') IN ('외국인', '외국인전형'))
+                )
+            </foreach>
+            )
+        </if>
+        <if test="sourceType == 'PUB' and jobAcdmcrCd != null and jobAcdmcrCd.size() > 0">
+            AND (
+            <foreach collection="jobAcdmcrCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(SUBSTRING(#{code}, 4, 1), REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(CONCAT('0', SUBSTRING(#{code}, 4, 1)), REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0
+                    OR (#{code} = 'R7010' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '학력무관')
+                    OR (#{code} = 'R7020' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') IN ('중졸', '중졸이하'))
+                    OR (#{code} = 'R7030' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '고졸')
+                    OR (#{code} = 'R7040' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') IN ('대졸(2~3년)', '대졸(2-3년)'))
+                    OR (#{code} = 'R7050' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '대졸(4년)')
+                    OR (#{code} = 'R7060' AND TRIM(COALESCE(j.MIN_EDUBG, '')) = '석사')
+                    OR (#{code} = 'R7070' AND TRIM(COALESCE(j.MIN_EDUBG, '')) = '박사')
+                )
+            </foreach>
+            )
+        </if>
+        <if test="sourceType == 'PUB' and jobEmpTpCd != null and jobEmpTpCd.size() > 0">
+            AND (
+            <foreach collection="jobEmpTpCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(SUBSTRING(#{code}, 4, 1), REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0
+                    OR FIND_IN_SET(CONCAT('0', SUBSTRING(#{code}, 4, 1)), REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0
+                    <!-- 고용24 공식 근로계약형태: 10/11=기간 없음, 20/21=기간 있음(11/21은 시간선택제) -->
+                    OR (#{code} = 'R1010' AND FIND_IN_SET('10', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1010' AND FIND_IN_SET('11', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1020' AND FIND_IN_SET('20', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1020' AND FIND_IN_SET('21', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1010' AND FIND_IN_SET('정규직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1020' AND FIND_IN_SET('계약직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1030' AND FIND_IN_SET('무기계약직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1040' AND FIND_IN_SET('비정규직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1050' AND FIND_IN_SET('청년인턴', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1060' AND FIND_IN_SET('체험형', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = 'R1070' AND FIND_IN_SET('채용형', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                )
+            </foreach>
+            )
+        </if>
+        <!-- 민간 필터: 원천코드·R코드·표시값 혼재 대응 -->
+        <if test="sourceType == 'PRV' and prvEmpTpCd != null and prvEmpTpCd.size() > 0">
+            AND (
+            <foreach collection="prvEmpTpCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0
+                    OR (#{code} = '1' AND FIND_IN_SET('R1010', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '2' AND FIND_IN_SET('R1020', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('R1050', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('R1060', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('R1070', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '1' AND FIND_IN_SET('10', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '1' AND FIND_IN_SET('11', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '2' AND FIND_IN_SET('20', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '2' AND FIND_IN_SET('21', REPLACE(COALESCE(j.JOB_EMP_TP_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '1' AND FIND_IN_SET('정규직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = '2' AND FIND_IN_SET('계약직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('인턴직', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = '6' AND FIND_IN_SET('프리랜서', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                    OR (#{code} = '7' AND FIND_IN_SET('아르바이트', REPLACE(COALESCE(j.EMP_TP_NM, ''), ' ', '')) > 0)
+                )
+            </foreach>
+            )
+        </if>
+        <if test="sourceType == 'PRV' and prvCareerCd != null and prvCareerCd.size() > 0">
+            AND (
+            <foreach collection="prvCareerCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0
+                    OR (#{code} = '1' AND FIND_IN_SET('R2010', REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '2' AND FIND_IN_SET('R2020', REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('R2030', REPLACE(COALESCE(j.JOB_CAREER_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '1' AND TRIM(COALESCE(j.CAREER, '')) = '신입')
+                    OR (#{code} = '2' AND TRIM(COALESCE(j.CAREER, '')) = '경력')
+                    OR (#{code} = '3' AND REPLACE(TRIM(COALESCE(j.CAREER, '')), ' ', '') IN ('신입/경력', '신입+경력'))
+                    OR (#{code} = '4' AND REPLACE(TRIM(COALESCE(j.CAREER, '')), ' ', '') IN ('관계없음', '경력무관'))
+                )
+            </foreach>
+            )
+        </if>
+        <if test="sourceType == 'PRV' and prvEduCd != null and prvEduCd.size() > 0">
+            AND (
+            <foreach collection="prvEduCd" item="code" separator=" OR ">
+                (
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0
+                    OR (#{code} = '0' AND FIND_IN_SET('R7010', REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '3' AND FIND_IN_SET('R7030', REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '4' AND FIND_IN_SET('R7040', REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '5' AND FIND_IN_SET('R7050', REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '7' AND FIND_IN_SET('R7070', REPLACE(COALESCE(j.JOB_ACDMCR_CD, ''), ' ', '')) > 0)
+                    OR (#{code} = '0' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '학력무관')
+                    OR (#{code} = '3' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '고졸')
+                    OR (#{code} = '4' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') IN ('대졸(2~3년)', '대졸(2-3년)'))
+                    OR (#{code} = '5' AND REPLACE(TRIM(COALESCE(j.MIN_EDUBG, '')), ' ', '') = '대졸(4년)')
+                    OR (#{code} = '7' AND TRIM(COALESCE(j.MIN_EDUBG, '')) = '박사')
+                )
+            </foreach>
+            )
+        </if>
+        <if test="sourceType == 'PRV' and prvJobCd != null and prvJobCd.size() > 0">
+            AND j.JOBABA_CMMN_274_CD IN
+            <foreach collection="prvJobCd" item="code" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
+        <!-- salaryNoCondition=true는 희망 임금 전체/해제 상태이므로 조건을 만들지 않는다. -->
+        <if test="salaryNoCondition == false and salaryType != null and salaryType != ''">
+            AND (
+                COALESCE(
+                    NULLIF(TRIM(j.SAL_TP_NM), ''),
+                    CASE
+                        WHEN COALESCE(j.SAL_AMT, '') LIKE '%연봉%' THEN '연봉'
+                        WHEN COALESCE(j.SAL_AMT, '') LIKE '%월급%' THEN '월급'
+                        WHEN COALESCE(j.SAL_AMT, '') LIKE '%일급%' THEN '일급'
+                        WHEN COALESCE(j.SAL_AMT, '') LIKE '%시급%' THEN '시급'
+                        ELSE NULL
+                    END
+                ) = #{salaryType}
+                <if test="salaryMin != null or salaryMax != null">
+                    AND REPLACE(COALESCE(j.SAL_AMT, ''), ',', '') REGEXP '[0-9]+'
+                </if>
+                <if test="salaryMin != null">
+                    AND (
+                        CASE
+                            WHEN REPLACE(COALESCE(j.SAL_AMT, ''), ',', '') LIKE '%~%'
+                                THEN CAST(REGEXP_SUBSTR(
+                                    SUBSTRING_INDEX(REPLACE(COALESCE(j.SAL_AMT, ''), ',', ''), '~', -1),
+                                    '[0-9]+'
+                                ) AS DECIMAL(20, 0))
+                            ELSE CAST(REGEXP_SUBSTR(
+                                REPLACE(COALESCE(j.SAL_AMT, ''), ',', ''),
+                                '[0-9]+'
+                            ) AS DECIMAL(20, 0))
+                        END
+                    ) >= #{salaryMin}
+                </if>
+                <if test="salaryMax != null">
+                    AND CAST(REGEXP_SUBSTR(
+                        REPLACE(COALESCE(j.SAL_AMT, ''), ',', ''),
+                        '[0-9]+'
+                    ) AS DECIMAL(20, 0)) &lt;= #{salaryMax}
+                </if>
+            )
+        </if>
+    </sql>
+
+    <!-- 뷰포트 내 채용공고 목록 (좌표 캐시 JOIN) -->
+    <select id="selectJobListByViewport" parameterType="kr.go.tkjf.usr.map.vo.MapSearchVO"
+            resultType="kr.go.tkjf.usr.map.vo.JobPostingVO">
+        SELECT
+            j.WANTED_AUTH_NO    AS wantedAuthNo,
+            j.SOURCE            AS source,
+            j.SOURCE_TYPE       AS sourceType,
+            j.COMPANY           AS company,
+            j.TITLE             AS title,
+            j.JOBS_NM           AS jobsNm,
+            j.JOBS_CD           AS jobsCd,
+            j.EMP_TP_NM         AS empTpNm,
+            j.CAREER            AS career,
+            j.MIN_EDUBG         AS minEdubg,
+            j.SAL_AMT           AS salAmt,
+            j.SAL_TP_NM         AS salTpNm,
+            j.REGION            AS region,
+            j.CLOSE_DT          AS closeDt,
+            j.WANTED_INFO_URL   AS wantedInfoUrl,
+            j.BASIC_ADDR        AS basicAddr,
+            j.INFO_SVC          AS infoSvc,
+            j.JOB_CAREER_CD     AS jobCareerCd,
+            j.JOB_ACDMCR_CD     AS jobAcdmcrCd,
+            j.JOB_EMP_TP_CD     AS jobEmpTpCd,
+            j.JOB_AREA_CD       AS jobAreaCd,
+            j.JOBABA_CMMN_276_CD AS jobabaCmmn276Cd,
+            j.JOBABA_CMMN_274_CD AS jobabaCmmn274Cd,
+            c.LAT               AS lat,
+            c.LNG               AS lng
+        FROM jwrki.v_job_posting j
+        INNER JOIN jwrki.tb_empmn_map_coord c ON j.WANTED_AUTH_NO = c.WANTED_AUTH_NO
+        <include refid="activeViewportJobWhere"/>
+        <choose>
+            <when test="sortType == 'closeDt'">
+                ORDER BY
+                    CASE
+                        WHEN j.CLOSE_DT REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' THEN 0
+                        ELSE 1
+                    END,
+                    j.CLOSE_DT ASC,
+                    j.REG_DT DESC
+            </when>
+            <otherwise>
+                ORDER BY j.REG_DT DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countJobListByViewport" parameterType="kr.go.tkjf.usr.map.vo.MapSearchVO"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM jwrki.v_job_posting j
+        INNER JOIN jwrki.tb_empmn_map_coord c ON j.WANTED_AUTH_NO = c.WANTED_AUTH_NO
+        <include refid="activeViewportJobWhere"/>
+    </select>
+
+    <!-- 채용공고 상세 -->
+    <select id="selectJobDetail" parameterType="String"
+            resultType="kr.go.tkjf.usr.map.vo.JobPostingVO">
+        SELECT
+            j.WANTED_AUTH_NO    AS wantedAuthNo,
+            j.SOURCE            AS source,
+            j.SOURCE_TYPE       AS sourceType,
+            j.COMPANY           AS company,
+            j.TITLE             AS title,
+            j.JOBS_NM           AS jobsNm,
+            j.EMP_TP_NM         AS empTpNm,
+            j.CAREER            AS career,
+            j.MIN_EDUBG         AS minEdubg,
+            j.SAL_AMT           AS salAmt,
+            j.SAL_TP_NM         AS salTpNm,
+            j.REGION            AS region,
+            j.CLOSE_DT          AS closeDt,
+            j.WANTED_INFO_URL   AS wantedInfoUrl,
+            j.BASIC_ADDR        AS basicAddr,
+            j.DETAIL_ADDR       AS detailAddr,
+            j.INFO_SVC          AS infoSvc,
+            j.JOB_CAREER_CD     AS jobCareerCd,
+            j.JOB_ACDMCR_CD     AS jobAcdmcrCd,
+            j.JOB_EMP_TP_CD     AS jobEmpTpCd,
+            j.JOB_AREA_CD       AS jobAreaCd,
+            j.JOBABA_CMMN_276_CD AS jobabaCmmn276Cd,
+            j.JOBABA_CMMN_274_CD AS jobabaCmmn274Cd,
+            c.LAT               AS lat,
+            c.LNG               AS lng
+        FROM jwrki.v_job_posting j
+        LEFT JOIN jwrki.tb_empmn_map_coord c ON j.WANTED_AUTH_NO = c.WANTED_AUTH_NO
+        WHERE j.WANTED_AUTH_NO = #{wantedAuthNo}
+          AND j.USE_YN = 'Y'
+          AND j.DEL_YN = 'N'
+    </select>
+
+    <!-- 좌표 저장 전 공고 존재 확인 -->
+    <select id="countJobPosting" parameterType="String" resultType="int">
+        SELECT COUNT(1)
+        FROM jwrki.v_job_posting
+        WHERE WANTED_AUTH_NO = #{wantedAuthNo}
+          AND USE_YN = 'Y'
+          AND DEL_YN = 'N'
+    </select>
+
+    <!-- 좌표 미변환 공고 목록 -->
+    <select id="selectJobListWithoutCoord" parameterType="kr.go.tkjf.usr.map.vo.MapSearchVO"
+            resultType="kr.go.tkjf.usr.map.vo.JobPostingVO">
+        SELECT
+            j.WANTED_AUTH_NO    AS wantedAuthNo,
+            j.SOURCE            AS source,
+            j.SOURCE_TYPE       AS sourceType,
+            j.COMPANY           AS company,
+            j.TITLE             AS title,
+            j.JOBS_NM           AS jobsNm,
+            j.JOBS_CD           AS jobsCd,
+            j.EMP_TP_NM         AS empTpNm,
+            j.CAREER            AS career,
+            j.MIN_EDUBG         AS minEdubg,
+            j.SAL_AMT           AS salAmt,
+            j.SAL_TP_NM         AS salTpNm,
+            j.REGION            AS region,
+            j.CLOSE_DT          AS closeDt,
+            j.WANTED_INFO_URL   AS wantedInfoUrl,
+            j.BASIC_ADDR        AS basicAddr,
+            j.DETAIL_ADDR       AS detailAddr,
+            j.INFO_SVC          AS infoSvc,
+            j.JOB_CAREER_CD     AS jobCareerCd,
+            j.JOB_ACDMCR_CD     AS jobAcdmcrCd,
+            j.JOB_EMP_TP_CD     AS jobEmpTpCd,
+            j.JOB_AREA_CD       AS jobAreaCd,
+            j.JOBABA_CMMN_276_CD AS jobabaCmmn276Cd,
+            j.JOBABA_CMMN_274_CD AS jobabaCmmn274Cd
+        FROM jwrki.v_job_posting j
+        LEFT JOIN jwrki.tb_empmn_map_coord c ON j.WANTED_AUTH_NO = c.WANTED_AUTH_NO
+        WHERE j.USE_YN = 'Y'
+          AND j.DEL_YN = 'N'
+          AND j.BASIC_ADDR IS NOT NULL
+          AND TRIM(j.BASIC_ADDR) != ''
+          AND (c.WANTED_AUTH_NO IS NULL OR c.GEOCODE_YN = 'N')
+        <include refid="openJobOnlyWhere"/>
+        <include refid="jobSearchFilters"/>
+        ORDER BY j.REG_DT DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 좌표 저장 -->
+    <insert id="insertCoord" parameterType="kr.go.tkjf.usr.map.vo.MapCoordVO">
+        INSERT INTO jwrki.tb_empmn_map_coord (WANTED_AUTH_NO, LAT, LNG, GEOCODE_YN, REG_DT)
+        VALUES (#{wantedAuthNo}, #{lat}, #{lng}, #{geocodeYn}, NOW())
+        ON DUPLICATE KEY UPDATE
+            LAT = #{lat}, LNG = #{lng}, GEOCODE_YN = #{geocodeYn}
+    </insert>
+
+</mapper>

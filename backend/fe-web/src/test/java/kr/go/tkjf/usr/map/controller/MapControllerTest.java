@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MapControllerTest {
 
-    private final MapController controller = new MapController("http://localhost:8081");
+    private final MapController controller = new MapController("test-kakao-key");
 
     @Test
     void mapPageReturnsMapJspViewAndDefaultPartner() {
@@ -17,6 +17,7 @@ class MapControllerTest {
 
         assertThat(viewName).isEqualTo("map/index");
         assertThat(model.getAttribute("partner")).isEqualTo("default");
+        assertThat(model.getAttribute("kakaoJsKey")).isEqualTo("test-kakao-key");
     }
 
     @Test
