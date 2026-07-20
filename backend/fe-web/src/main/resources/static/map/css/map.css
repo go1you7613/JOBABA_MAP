@@ -27,7 +27,7 @@ a { text-decoration: none; color: inherit; }
     --gray-700:   #374151;
     --gray-900:   #111827;
     --white:      #ffffff;
-    --header-h:   56px;
+    --header-h:   72px;
     --panel-w:    340px;
     --radius-sm:  6px;
     --radius-md:  10px;
@@ -70,8 +70,6 @@ a { text-decoration: none; color: inherit; }
 }
 
 .header-logo { flex-shrink: 0; }
-.logo-text { font-size: 16px; color: var(--gray-700); letter-spacing: -.5px; }
-.logo-text strong { color: var(--primary); }
 
 .search-wrap {
     flex: 1;
@@ -913,9 +911,25 @@ a { text-decoration: none; color: inherit; }
     align-items: stretch;
 }
 .filter-summary {
-    font-size: 12px;
-    color: var(--primary);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     padding: 4px 0;
+}
+.filter-summary.is-empty {
+    font-size: 12px;
+    color: var(--gray-600);
+}
+.filter-summary-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--primary-lt);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 .filter-footer-btns {
     display: flex;
@@ -946,6 +960,7 @@ a { text-decoration: none; color: inherit; }
 
 #filterModal .filter-row {
     display: grid;
+    align-content: start;
     gap: 12px;
     padding: 14px;
     margin-bottom: 12px;
@@ -957,6 +972,10 @@ a { text-decoration: none; color: inherit; }
 
 #filterModal .filter-row-last {
     margin-bottom: 0;
+}
+
+#filterModal #filterSectionPrv .filter-row-last {
+    grid-column: 1 / -1;
 }
 
 #filterModal .filter-section {
@@ -1058,6 +1077,52 @@ a { text-decoration: none; color: inherit; }
     height: 1px;
     opacity: 0;
     pointer-events: none;
+}
+
+/* 고용형태·경력·학력은 선택 상태를 버튼 배경이 아닌 체크박스로 표시한다. */
+#filterModal .filter-checkbox-row .cb-label {
+    min-height: 24px;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 2px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    text-align: left;
+    transition: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label input[type="checkbox"] {
+    position: static;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    border-radius: initial;
+    opacity: 1;
+    pointer-events: auto;
+    accent-color: auto;
+    transition: none;
+    animation: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label:has(input:checked) {
+    border-color: transparent;
+    background: transparent;
+    color: var(--gray-700);
+    box-shadow: none;
+}
+
+#filterModal .filter-checkbox-row .cb-label:hover {
+    border-color: transparent;
+    color: var(--gray-700);
+    background: transparent;
+}
+
+#filterModal .filter-checkbox-row .cb-label:focus-within {
+    outline: 0;
 }
 
 #filterModal .cb-label:focus-within {
@@ -1260,7 +1325,7 @@ a { text-decoration: none; color: inherit; }
 .job-marker-count { display: inline-block; margin-left: 3px; }
 
 /* ── Responsive: Mobile ── */
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     :root { --panel-w: 0px; }
 
     html, body, #app { width: 100%; max-width: 100%; }
@@ -1360,7 +1425,7 @@ a { text-decoration: none; color: inherit; }
     .btn-research { top: 8px; }
 
     .header-logo { display: none; }
-    .modal-sheet { max-width: 100%; }
+    .modal-sheet:not(.modal-center) { max-width: 100%; }
 
     .modal-sheet-lg {
         width: 100%;
@@ -1487,14 +1552,6 @@ body {
     width: 24px;
     height: 24px;
     stroke-width: 2.4;
-}
-
-.logo-text {
-    color: var(--text-strong);
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: 0;
-    word-break: keep-all;
 }
 
 .search-wrap {
@@ -2468,7 +2525,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     :root {
         --panel-w: 0px;
         --header-h: 64px;
@@ -2488,19 +2545,6 @@ body {
     .logo-mark {
         width: 28px;
         height: 28px;
-    }
-
-    .logo-text {
-        max-width: 72px;
-        font-size: 0;
-        line-height: 1.2;
-    }
-
-    .logo-text::after {
-        content: '일자리 맵';
-        color: var(--text-strong);
-        font-size: 15px;
-        font-weight: 900;
     }
 
     .search-wrap {
@@ -2773,7 +2817,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
     #filterModal {
         inset: var(--header-h) 0 0 0;
         width: 100vw;
@@ -2830,5 +2874,239 @@ body {
 
     #filterModal .radio-label {
         min-height: 30px;
+    }
+}
+
+/* ============================================================
+   기능 구현 요청 v2 — 브랜드, 빈 상태, 급여 필터, 모바일 범례
+   ============================================================ */
+.header-logo {
+    width: auto;
+    min-width: 0;
+}
+
+.logo-map {
+    display: block;
+    width: auto;
+    height: 64px;
+    flex: 0 0 auto;
+}
+
+.modal-character {
+    position: relative;
+    width: 105px;
+    aspect-ratio: 227 / 237;
+    margin: 0 auto 16px;
+}
+
+.modal-character img {
+    position: absolute;
+    display: block;
+    max-width: none;
+}
+
+.modal-character-base {
+    top: 2.03%;
+    left: 2.74%;
+    width: 94.52%;
+    height: 97.59%;
+}
+
+.modal-character-overlay {
+    top: 1.12%;
+    left: 10.54%;
+    width: 56.52%;
+    height: 67.02%;
+}
+
+.no-result {
+    gap: 6px;
+    padding: 24px;
+    text-align: center;
+}
+
+.no-result-character {
+    display: block;
+    width: 132px;
+    max-width: 48%;
+    height: auto;
+    margin: 0 auto 12px;
+}
+
+.no-result > p:not(.no-result-sub) {
+    color: var(--text-body);
+    font-weight: 800;
+}
+
+.no-result-sub {
+    line-height: 1.5;
+}
+
+.detail-salary {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 18px;
+}
+
+.detail-salary-value {
+    color: var(--text-strong);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+#filterModal .filter-salary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.salary-type-field,
+.salary-range-field {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    color: var(--text-body);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.salary-type-field {
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: center;
+}
+
+.salary-range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.salary-input-wrap {
+    position: relative;
+    display: block;
+    min-width: 0;
+}
+
+#filterModal .sel-sal,
+#filterModal .input-sal {
+    width: 100%;
+    min-height: 40px;
+    border-color: #dbe4ef;
+    border-radius: var(--radius-sm);
+    background-color: #fff;
+    color: var(--text-strong);
+    font-size: 13px;
+}
+
+#filterModal .input-sal {
+    padding: 0 46px 0 12px;
+    text-align: left;
+}
+
+.salary-unit {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+#filterModal .salary-no-condition {
+    justify-self: start;
+    min-width: 112px;
+    min-height: 36px;
+}
+
+.filter-salary.is-disabled .salary-type-field,
+.filter-salary.is-disabled .salary-range {
+    opacity: .55;
+}
+
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
+    .logo-map {
+        width: auto;
+        height: 42px;
+    }
+
+    .modal-character {
+        width: 92px;
+    }
+
+    .no-result-character {
+        width: 112px;
+    }
+
+    .main-layout.mobile-map-view .map-legend {
+        display: block;
+        left: 12px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        width: 118px;
+        padding: 10px 11px;
+        border-radius: 10px;
+    }
+
+    .main-layout.mobile-map-view .legend-section {
+        gap: 7px;
+        font-size: 11px;
+    }
+
+    .main-layout.mobile-map-view .legend-section strong {
+        font-size: 12px;
+    }
+
+    .main-layout.mobile-map-view .legend-section span {
+        gap: 6px;
+    }
+
+    .main-layout.mobile-map-view .legend-dot {
+        width: 11px;
+        height: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .salary-range {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 380px) {
+    .map-top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        overflow: visible;
+    }
+
+    .map-location-label {
+        align-self: flex-start;
+        max-width: 100%;
+        min-height: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .map-top-actions {
+        flex: 0 0 auto;
+        width: 100%;
+        gap: 6px;
+        overflow: visible;
+    }
+
+    .map-top-actions .btn-map-top {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .map-top-actions .radius-select {
+        flex: 1 1 90px;
+        min-width: 88px;
+        width: auto;
     }
 }

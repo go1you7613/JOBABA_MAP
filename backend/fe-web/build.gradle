@@ -4,7 +4,9 @@ plugins {
 }
 
 dependencies {
+    implementation project(':core')
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
     implementation 'javax.servlet:jstl'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'

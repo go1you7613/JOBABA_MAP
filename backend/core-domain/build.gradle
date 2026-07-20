@@ -4,3 +4,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/java'
+            include '**/*.xml'
+        }
+    }
+}
