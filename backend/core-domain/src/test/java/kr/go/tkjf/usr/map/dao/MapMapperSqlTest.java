@@ -74,6 +74,23 @@ class MapMapperSqlTest {
     }
 
     @Test
+    void publicNcsFilterSupportsDirectPublicPortalCodes() {
+        MapSearchVO searchVO = viewportSearch();
+        searchVO.setSourceType("PUB");
+        searchVO.setJobNcsCd(List.of("R600001", "R600002"));
+
+        BoundSql boundSql = boundSql(searchVO);
+        String sql = compact(boundSql.getSql());
+
+        assertThat(sql)
+                .contains("m.JOBABA_CD = j.JOBABA_CMMN_276_CD")
+                .contains("FIND_IN_SET(?, REPLACE(COALESCE(j.JOBS_CD, ''), ' ', '')) > 0");
+        assertThat(parameterProperties(boundSql).stream()
+                .filter(property -> property.contains("code"))
+                .count()).isEqualTo(4);
+    }
+
+    @Test
     void mapperKeepsCodesBoundAndAvoidsPrivateEmploymentFalseMappings() throws IOException {
         String mapperXml;
         try (InputStream input = resourceStream()) {

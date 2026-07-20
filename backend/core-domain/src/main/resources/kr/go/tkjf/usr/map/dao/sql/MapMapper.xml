@@ -58,16 +58,23 @@
         </if>
         <!-- 공공 필터: NCS↔잡아바 매핑 대응 -->
         <if test="sourceType == 'PUB' and jobNcsCd != null and jobNcsCd.size() > 0">
-            AND EXISTS (
-                SELECT 1
-                FROM tb_jobcls_ncs_map m
-                WHERE m.NCS_CD IN
-                <foreach collection="jobNcsCd" item="code" open="(" separator="," close=")">
-                    #{code}
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM tb_jobcls_ncs_map m
+                    WHERE m.NCS_CD IN
+                    <foreach collection="jobNcsCd" item="code" open="(" separator="," close=")">
+                        #{code}
+                    </foreach>
+                      AND m.JOBABA_GRP_CD = 'CMMN_276'
+                      AND m.JOBABA_CD = j.JOBABA_CMMN_276_CD
+                      AND m.USE_YN = 'Y'
+                )
+                OR (
+                <foreach collection="jobNcsCd" item="code" separator=" OR ">
+                    FIND_IN_SET(#{code}, REPLACE(COALESCE(j.JOBS_CD, ''), ' ', '')) > 0
                 </foreach>
-                  AND m.JOBABA_GRP_CD = 'CMMN_276'
-                  AND m.JOBABA_CD = j.JOBABA_CMMN_276_CD
-                  AND m.USE_YN = 'Y'
+                )
             )
         </if>
         <if test="sourceType == 'PUB' and jobCareerCd != null and jobCareerCd.size() > 0">
