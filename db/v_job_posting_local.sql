@@ -172,8 +172,12 @@ SELECT
     jk.JOB_TYPE_INFO        AS EMP_TP_NM,
     jk.CAREER_INFO          AS CAREER,
     jk.EDU_CUTLINE_INFO     AS MIN_EDUBG,
-    jk.PAY_INFO             AS SAL_AMT,
-    NULL                    AS SAL_TP_NM,
+    COALESCE(NULLIF(TRIM(jk.PAY_TERM_INFO), ''), jk.PAY_INFO)
+                            AS SAL_AMT,
+    CASE
+        WHEN NULLIF(TRIM(jk.PAY_TERM_INFO), '') IS NOT NULL THEN jk.PAY_INFO
+        ELSE NULL
+    END                     AS SAL_TP_NM,
     jk.AREA_INFO            AS REGION,
     CASE WHEN jk.GI_END_DATE REGEXP '^[0-9]{8}$'
          THEN CONCAT(SUBSTR(jk.GI_END_DATE,1,4),'-',SUBSTR(jk.GI_END_DATE,5,2),'-',SUBSTR(jk.GI_END_DATE,7,2))
