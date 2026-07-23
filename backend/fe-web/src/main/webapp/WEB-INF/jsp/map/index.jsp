@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="/map/css/map.css?v=20260713-rotation-fix">
+    <link rel="stylesheet" href="/map/css/map.css?v=20260723-selected-marker">
 </head>
 <body data-theme="corporate">
 <div id="app">
@@ -412,6 +412,6 @@
 
 <script src="/map/js/kakao-key.js?v=20260629-closed-fix"></script>
 <script src="/map/js/map-location-data.js?v=20260629-closed-fix"></script>
-<script src="/map/js/map.js?v=20260713-rotation-fix"></script>
+<script src="/map/js/map.js?v=20260723-selected-marker"></script>
 </body>
 </html>

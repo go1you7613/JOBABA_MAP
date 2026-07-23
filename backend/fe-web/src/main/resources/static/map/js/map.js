@@ -44,6 +44,7 @@
         loadingMoreJobs: false,
         mapReady: false,
         mapFailed: false,
+        suppressIdleLoadUntil: 0,
         mobileListMapViewport: null,
         locationLabelOverride: '',
         // 위치 재선택
@@ -241,10 +242,14 @@
         state.mapReady = true;
         // idle 이벤트마다 자동 재검색 (고용24 방식)
         kakao.maps.event.addListener(state.map, 'idle', function () {
+            if (Date.now() < state.suppressIdleLoadUntil) {
+                return;
+            }
             if ($mainLayout && $mainLayout.classList.contains('mobile-list-view')) return;
             loadJobs();
         });
         kakao.maps.event.addListener(state.map, 'dragstart', function () {
+            state.suppressIdleLoadUntil = 0;
             state.locationLabelOverride = '';
         });
         loadJobs();
@@ -664,6 +669,13 @@
     }
 
     /* ─── 마커 ─── */
+    function getSelectedMarkerCharacterHtml() {
+        return '<span class="selected-marker-character" aria-hidden="true">' +
+            '<img class="selected-marker-character-base" src="/map/images/brand/jobaba-marker-character-base.svg" alt="">' +
+            '<img class="selected-marker-character-magnifier" src="/map/images/brand/jobaba-marker-character-magnifier.svg" alt="">' +
+        '</span>';
+    }
+
     function renderMarkers(jobs) {
         if (!state.mapReady || !state.map) return;
         hideMarkerJobPopover();
@@ -678,6 +690,7 @@
             var markerId = 'group-' + index;
             var content =
                 '<button type="button" class="job-marker ' + kind.className + ' ' + sizeClass + '" data-id="' + markerId + '" aria-label="' + escapeHtml(kind.label + ' 채용공고 ' + group.jobs.length + '건') + '">' +
+                    getSelectedMarkerCharacterHtml() +
                     '<span class="job-marker-icon">' + group.jobs.length + '</span>' +
                 '</button>';
             var overlay = new kakao.maps.CustomOverlay({ position: pos, content: content, yAnchor: .5 });
@@ -772,6 +785,7 @@
             marker.style.left = Math.max(2, Math.min(98, x)) + '%';
             marker.style.top = Math.max(2, Math.min(98, y)) + '%';
             marker.innerHTML =
+                getSelectedMarkerCharacterHtml() +
                 '<span class="local-marker-dot"></span>' +
                 '<span class="local-marker-label">' + group.jobs.length + '건</span>';
 
@@ -786,16 +800,23 @@
         var jobs = mo.jobs || (mo.job ? [mo.job] : []);
         var job = selectedJob || mo.job || jobs[0];
         if (!job) return;
+        if (!mo.el && mo.markerId) {
+            mo.el = document.querySelector('.job-marker[data-id="' + mo.markerId + '"]');
+        }
         if (state.selectedMarker && state.selectedMarker.el)
             state.selectedMarker.el.classList.remove('selected');
+        if (state.selectedMarker && state.selectedMarker.overlay)
+            state.selectedMarker.overlay.setZIndex(0);
         state.selectedMarker = mo;
         if (mo.el) mo.el.classList.add('selected');
+        if (mo.overlay) mo.overlay.setZIndex(210);
         if (!selectedJob && jobs.length > 1) {
             showMarkerJobPopover(mo);
             return;
         }
         hideMarkerJobPopover();
         if (state.mapReady && state.map) {
+            state.suppressIdleLoadUntil = Date.now() + 1500;
             state.map.panTo(new kakao.maps.LatLng(parseFloat(job.lat), parseFloat(job.lng)));
         }
         loadJobDetail(job.wantedAuthNo);

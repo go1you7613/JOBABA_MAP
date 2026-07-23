@@ -2317,6 +2317,55 @@ body {
 .local-job-marker.is-private .local-marker-dot { background: var(--accent); }
 .local-job-marker.is-mixed .local-marker-dot { background: var(--mixed); }
 
+/* 선택 마커 강조 */
+.selected-marker-character {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 7px);
+    display: none;
+    width: 58px;
+    aspect-ratio: 227 / 237;
+    transform: translateX(-50%);
+    pointer-events: none;
+    filter: drop-shadow(0 4px 5px rgba(15, 35, 70, .2));
+}
+
+.selected-marker-character img {
+    position: absolute;
+    display: block;
+    max-width: none;
+}
+
+.selected-marker-character-base {
+    inset: 2.03% 2.74% .38%;
+    width: 94.52%;
+    height: 97.59%;
+}
+
+.selected-marker-character-magnifier {
+    inset: 1.12% 32.94% 31.86% 10.54%;
+    width: 56.52%;
+    height: 67.02%;
+}
+
+.job-marker.selected,
+.local-job-marker.selected {
+    border-color: #e53935;
+}
+
+.job-marker.selected {
+    box-shadow: 0 12px 24px rgba(229, 57, 53, .3);
+}
+
+.local-job-marker.selected {
+    box-shadow: 0 8px 18px rgba(229, 57, 53, .24);
+}
+
+.job-marker.selected .selected-marker-character,
+.local-job-marker.selected .selected-marker-character {
+    display: block;
+}
+
 .job-detail {
     left: auto;
     right: 54px;
